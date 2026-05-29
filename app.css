@@ -4742,12 +4742,3 @@ body.design-v2 .retro-nav{display:none!important}body.design-v2 .scroll,body.des
 body.flight-mode .design-bottom{grid-template-columns:repeat(3,minmax(0,1fr))}body.flight-mode .design-tab[data-target="home"]{display:none}body.flight-mode .fi-hero,body.flight-mode .gps-hero,body.flight-mode .nav-hero,body.flight-mode .hero{display:none!important}body.flight-mode .nav-big b{font-size:34px!important}body.flight-mode .nav-map-wrap,body.flight-mode #nav-mode-canvas{min-height:470px!important;height:470px!important}.flight-indicator{position:fixed;left:10px;top:calc(env(safe-area-inset-top,0px) + 44px);z-index:99999;display:none;border:1px solid rgba(217,255,95,.35);background:rgba(45,45,7,.78);color:var(--am);font-family:var(--mono,monospace);font-size:9px;letter-spacing:1px;padding:7px 9px;border-radius:4px;text-transform:uppercase}body.flight-mode .flight-indicator{display:block}
 @media(max-width:620px){.design-quick{grid-template-columns:1fr}.theme-row{grid-template-columns:1fr}}
 /* END SAFE ADDON — DESIGN HUB V2 */
-
-/* SAFE ADDON — SOFT INTRO NAV HIDE */
-body.soft-intro-hide .design-bottom{
-  display:none!important;
-}
-body.soft-intro-hide .compact-status{
-  display:none!important;
-}
-/* END SAFE ADDON — SOFT INTRO NAV HIDE */

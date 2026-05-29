@@ -6431,67 +6431,72 @@ function zonesViewZoom(val) {
 })();
 // END SAFE ADDON — DESIGN HUB V2
 
-// SAFE ADDON — SOFT INTRO NAV HIDE
+
+// AVISCALC EMERGENCY NO-CACHE MODE
+(function(){
+  // Do not block app; just clean caches in background.
+  function clean(){
+    if("serviceWorker" in navigator){
+      navigator.serviceWorker.getRegistrations().then(function(regs){
+        regs.forEach(function(reg){ reg.unregister(); });
+      }).catch(function(){});
+    }
+    if(window.caches && caches.keys){
+      caches.keys().then(function(keys){
+        keys.forEach(function(k){
+          if(String(k).toLowerCase().indexOf("aviscalc") !== -1){
+            caches.delete(k);
+          }
+        });
+      }).catch(function(){});
+    }
+  }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", clean);
+  else clean();
+})();
+
+// AVISCALC EMERGENCY BOOT WATCHDOG
 (function(){
   function visibleText(){
-    var active = document.querySelector(".page.active") ||
-                 document.querySelector(".screen.active") ||
-                 document.body;
-    return String(active.textContent || "").replace(/\s+/g, " ").toUpperCase();
+    return String(document.body && document.body.textContent || "").replace(/\s+/g, " ").toUpperCase();
   }
 
-  function shouldHide(){
-    var t = visibleText();
-    if(t.indexOf("AVIS OS") !== -1) return true;
-    if(t.indexOf("ЗАПУСК TACTICAL INTERFACE") !== -1) return true;
-    if(t.indexOf("AVIS РАСЧ") !== -1 && t.indexOf("ВОЙТИ В КАБИНУ") !== -1) return true;
-    if(t.indexOf("БЕЗ НАВИГАЦИИ") !== -1 && t.indexOf("НЕТ АВИАЦИИ") !== -1) return true;
+  function tryEnterCabin(){
+    var buttons = Array.from(document.querySelectorAll("button,a,div"));
+    var enter = buttons.find(function(b){
+      var t = String(b.textContent || "").toUpperCase();
+      return t.indexOf("ВОЙТИ В КАБИНУ") !== -1 || t.indexOf("ENTER") !== -1;
+    });
+    if(enter && typeof enter.click === "function"){
+      enter.click();
+      return true;
+    }
+
+    if(typeof window.showTab === "function"){
+      try{
+        window.showTab("home-v2");
+        return true;
+      }catch(e){}
+      try{
+        window.showTab("aircraft");
+        return true;
+      }catch(e){}
+    }
     return false;
   }
 
-  function update(){
-    document.body.classList.toggle("soft-intro-hide", shouldHide());
-  }
-
-  function patch(){
-    if(window.__softIntroNavHidePatched) return;
-    window.__softIntroNavHidePatched = true;
-
-    if(typeof window.showTab === "function"){
-      var old = window.showTab;
-      window.showTab = function(){
-        var r = old.apply(this, arguments);
-        setTimeout(update, 100);
-        return r;
-      };
+  // If the boot screen is still visible after too long, try to continue.
+  setTimeout(function(){
+    var t = visibleText();
+    if(t.indexOf("AVIS OS") !== -1 || t.indexOf("ЗАПУСК TACTICAL") !== -1){
+      tryEnterCabin();
     }
-  }
+  }, 6500);
 
-  function init(){
-    patch();
-    update();
-    setInterval(update, 700);
-    window.addEventListener("load", function(){
-      setTimeout(update, 300);
-      setTimeout(update, 1200);
-      setTimeout(update, 3000);
-    });
-  }
-
-  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-  else init();
-})();
-// END SAFE ADDON — SOFT INTRO NAV HIDE
-
-
-
-// AVISCALC CACHE REFRESH V1.0.3
-(function(){
-  if("serviceWorker" in navigator){
-    navigator.serviceWorker.getRegistration().then(function(reg){
-      if(!reg) return;
-      reg.update();
-      if(reg.waiting) reg.waiting.postMessage("SKIP_WAITING_AVISCALC");
-    }).catch(function(){});
-  }
+  setTimeout(function(){
+    var t = visibleText();
+    if(t.indexOf("AVIS OS") !== -1 || t.indexOf("ЗАПУСК TACTICAL") !== -1){
+      tryEnterCabin();
+    }
+  }, 10000);
 })();

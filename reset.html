@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AvisCalc Reset</title>
+<style>
+body{margin:0;background:#010701;color:#9dff61;font-family:monospace;display:grid;place-items:center;min-height:100vh}
+.box{max-width:720px;padding:24px;border:1px solid #22451d;background:#041004;border-radius:8px}
+h1{letter-spacing:3px}
+button,a{display:inline-block;margin-top:14px;border:1px solid #64c93a;background:#061406;color:#9dff61;padding:12px 14px;border-radius:4px;font-family:monospace;text-decoration:none}
+pre{color:#6f9f63;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>AVISCALC RESET</h1>
+<pre id="log">Очистка service worker и кэша...</pre>
+<a href="./index.html?reset=1">Открыть AvisCalc</a>
+</div>
+<script>
+(async function(){
+  const log = document.getElementById("log");
+  function add(t){ log.textContent += "\n" + t; }
+
+  try{
+    if("serviceWorker" in navigator){
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for(const reg of regs){
+        await reg.unregister();
+        add("Service worker removed");
+      }
+    }else add("Service worker API unavailable");
+  }catch(e){ add("SW error: " + e.message); }
+
+  try{
+    if(window.caches){
+      const keys = await caches.keys();
+      for(const key of keys){
+        await caches.delete(key);
+        add("Cache removed: " + key);
+      }
+    }else add("Cache API unavailable");
+  }catch(e){ add("Cache error: " + e.message); }
+
+  add("Готово. Нажми «Открыть AvisCalc».");
+})();
+</script>
+</body>
+</html>
