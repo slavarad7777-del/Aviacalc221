@@ -4743,22 +4743,25 @@ body.flight-mode .design-bottom{grid-template-columns:repeat(3,minmax(0,1fr))}bo
 @media(max-width:620px){.design-quick{grid-template-columns:1fr}.theme-row{grid-template-columns:1fr}}
 /* END SAFE ADDON — DESIGN HUB V2 */
 
-/* SAFE ADDON — START SCREEN BOTTOM NAV FIX */
+/* SAFE ADDON — DESIGN NAV ENTER GATE */
 
-/* Скрываем Design Hub нижнюю плашку на старом главном экране */
-body.start-screen-no-bottom .design-bottom{
+/* По умолчанию стартовые экраны чистые: без нижнего меню и без кнопки Compact */
+body:not(.cabin-entered) .design-bottom,
+body:not(.cabin-entered) .compact-toggle,
+body:not(.cabin-entered) .compact-status,
+body:not(.cabin-entered) .flight-indicator{
   display:none!important;
 }
 
-/* Убираем нижний искусственный отступ, который добавлялся под меню */
-body.start-screen-no-bottom .scroll,
-body.start-screen-no-bottom main{
+/* Пока кабина не открыта, не добавляем нижний отступ под меню */
+body:not(.cabin-entered) .scroll,
+body:not(.cabin-entered) main{
   padding-bottom:0!important;
 }
 
-/* На стартовом экране компактная верхняя строка не нужна */
-body.start-screen-no-bottom .compact-status{
-  display:none!important;
+/* После входа в кабину меню снова работает */
+body.cabin-entered.design-v2 .design-bottom{
+  display:grid;
 }
 
-/* END SAFE ADDON — START SCREEN BOTTOM NAV FIX */
+/* END SAFE ADDON — DESIGN NAV ENTER GATE */

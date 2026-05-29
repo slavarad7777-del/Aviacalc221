@@ -6426,7 +6426,7 @@ function zonesViewZoom(val) {
   function ensureMore(){if(el("tab-more-v2"))return;var scroll=q(".scroll");if(!scroll)return;var page=document.createElement("div");page.className="page";page.id="tab-more-v2";var tiles=[["Самолёты","aircraft","✈","Профили и ДА-42Т"],["Чек-листы","checklists","☑","Карты процедур"],["Маршрут","route","↗","Расчёт и точки"],["Зоны","zones","⬡","Импорт и контроль"],["AIP","aip","▤","Документы"],["Файл","file-import","⇪","KML GPX GeoJSON"],["GPS","gps-map","⌖","Диагностика"],["Настройки","home","⚙","Темы и режимы"]];page.innerHTML='<div class="design-home"><section class="design-home-hero"><div class="design-home-kicker">MODULES</div><div class="design-home-title">Ещё</div><div class="design-home-sub">Все разделы AvisCalc.</div></section><section class="more-grid">'+tiles.map(function(t){return'<button class="more-tile" data-go="'+t[1]+'"><div class="ico">'+t[2]+'</div><b>'+t[0]+'</b><small>'+t[3]+'</small></button>'}).join("")+'</section></div>';scroll.appendChild(page);page.querySelectorAll(".more-tile").forEach(function(b){b.addEventListener("click",function(){go(b.dataset.go)})})}
   function updateHome(){var ac="ДА-42Т";try{var a=JSON.parse(localStorage.getItem("aviscalc_active_aircraft")||"null");if(a&&a.name)ac=a.name}catch(e){}var gps="—";try{if(window.__aviscalcGpsLastPosition&&window.__aviscalcGpsLastPosition.coords)gps="OK ±"+Math.round(window.__aviscalcGpsLastPosition.coords.accuracy||0)+"м"}catch(e){}var nav=(el("nav-status")&&el("nav-status").textContent)||"STANDBY";var r=0;try{var route=JSON.parse(localStorage.getItem("aviscalc_imported_route_json")||"[]");if(Array.isArray(route))r=route.length}catch(e){};({"home-ac":ac,"home-gps":gps,"home-nav":nav,"home-route":r+" WP"});Object.entries({"home-ac":ac,"home-gps":gps,"home-nav":nav,"home-route":r+" WP"}).forEach(function(x){var e=el(x[0]);if(e)e.textContent=x[1]})}
   function patch(){if(window.__designHubV2Patched)return;window.__designHubV2Patched=true;if(typeof window.showTab==="function"){var old=window.showTab;window.showTab=function(t){ensureHome();ensureMore();if(t==="home-v2"||t==="more-v2"){document.querySelectorAll(".page").forEach(function(p){p.classList.toggle("active",p.id==="tab-"+t)});document.querySelectorAll(".design-tab").forEach(function(b){b.classList.toggle("active",(t==="home-v2"&&b.dataset.target==="home")||(t==="more-v2"&&b.dataset.target==="more"))});var sc=q(".scroll");if(sc)sc.scrollTop=0;updateHome();return}var res=old.apply(this,arguments);setTimeout(updateHome,120);return res}}}
-  function init(){document.body.classList.add("design-v2");addBottom();addFlightIndicator();ensureHome();ensureMore();patch();applyTheme(load(THEME_KEY,"green"));applyFlight(load(FLIGHT_KEY,"0")==="1");setTimeout(function(){show("home")},250);setInterval(updateHome,10000)}
+  function init(){document.body.classList.add("design-v2");addBottom();addFlightIndicator();ensureHome();ensureMore();patch();applyTheme(load(THEME_KEY,"green"));applyFlight(load(FLIGHT_KEY,"0")==="1");/* Design Hub auto-home disabled until cabin entered */setInterval(updateHome,10000)}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
 // END SAFE ADDON — DESIGN HUB V2
@@ -6501,57 +6501,45 @@ function zonesViewZoom(val) {
   }, 10000);
 })();
 
-// SAFE ADDON — START SCREEN BOTTOM NAV FIX
+// SAFE ADDON — DESIGN NAV ENTER GATE
 (function(){
-  var entered = false;
+  var KEY = "aviscalc_cabin_entered_gate_v1";
 
-  function cleanText(s){
+  function clean(s){
     return String(s || "").replace(/\s+/g, " ").trim().toUpperCase();
   }
 
-  function visibleEnough(el){
-    if(!el || el === document.body || el === document.documentElement) return false;
-    var st = window.getComputedStyle(el);
-    if(st.display === "none" || st.visibility === "hidden" || Number(st.opacity) === 0) return false;
-    var r = el.getBoundingClientRect();
-    if(r.width < 80 || r.height < 60) return false;
-    if(r.bottom < 0 || r.top > window.innerHeight) return false;
-    return true;
+  function setEntered(v){
+    document.body.classList.toggle("cabin-entered", !!v);
+    try{
+      if(v) sessionStorage.setItem(KEY, "1");
+      else sessionStorage.removeItem(KEY);
+    }catch(e){}
   }
 
-  function hasStartScreen(){
-    var nodes = Array.from(document.querySelectorAll("section, main, .page, .screen, div"));
-    for(var i=0;i<nodes.length;i++){
-      var n = nodes[i];
-      if(!visibleEnough(n)) continue;
-      var t = cleanText(n.textContent);
-
-      // Старый красивый главный экран из скрина
-      var isOldHome =
-        t.indexOf("AVIS РАСЧ") !== -1 &&
-        (
-          t.indexOf("СУ-25") !== -1 ||
-          t.indexOf("ЯК-130") !== -1 ||
-          t.indexOf("ДА-42Т") !== -1 ||
-          t.indexOf("ВОЙТИ В КАБИНУ") !== -1 ||
-          t.indexOf("БЕЗ НАВИГАЦИИ") !== -1
-        );
-
-      // Загрузочный экран
-      var isBoot =
-        t.indexOf("AVIS OS") !== -1 ||
-        t.indexOf("ЗАПУСК TACTICAL INTERFACE") !== -1;
-
-      if(isOldHome || isBoot) return true;
+  function hasEntered(){
+    try{
+      return sessionStorage.getItem(KEY) === "1";
+    }catch(e){
+      return document.body.classList.contains("cabin-entered");
     }
-    return false;
   }
 
-  function isWorkingPage(){
+  function isEnterElement(node){
+    var t = clean(node && node.textContent);
+    return (
+      t.indexOf("ВОЙТИ В КАБИНУ") !== -1 ||
+      t.indexOf("В КАБИНУ") !== -1 ||
+      t.indexOf("ENTER CABIN") !== -1
+    );
+  }
+
+  function isWorkScreen(){
     var active = document.querySelector(".page.active");
     if(!active) return false;
+
     var id = String(active.id || "").toLowerCase();
-    var t = cleanText(active.textContent);
+    var t = clean(active.textContent);
 
     if(id.indexOf("home-v2") !== -1) return true;
     if(id.indexOf("more-v2") !== -1) return true;
@@ -6559,6 +6547,8 @@ function zonesViewZoom(val) {
     if(id.indexOf("gps-map") !== -1) return true;
     if(id.indexOf("file-import") !== -1) return true;
     if(id.indexOf("tab-map") !== -1) return true;
+    if(id.indexOf("aircraft") !== -1) return true;
+    if(id.indexOf("check") !== -1) return true;
 
     if(t.indexOf("NAV MODE") !== -1) return true;
     if(t.indexOf("СЕГОДНЯ / ПОЛЁТ") !== -1 || t.indexOf("СЕГОДНЯ / ПОЛЕТ") !== -1) return true;
@@ -6568,31 +6558,23 @@ function zonesViewZoom(val) {
     return false;
   }
 
-  function update(){
-    var work = isWorkingPage();
-    if(work) entered = true;
-
-    var start = hasStartScreen();
-
-    // Скрываем только если видим стартовый экран и ещё не перешли в рабочий режим.
-    // Если старый экран всё ещё находится в DOM на фоне, но активна рабочая вкладка — не скрываем.
-    document.body.classList.toggle("start-screen-no-bottom", start && !work);
+  function revealDesignHome(){
+    // После входа в кабину можно открыть новый красивый главный экран.
+    if(typeof window.showTab === "function"){
+      try{
+        window.showTab("home-v2");
+        return;
+      }catch(e){}
+    }
   }
 
   function onClick(e){
     var n = e.target;
     while(n && n !== document.body){
-      var t = cleanText(n.textContent);
-      if(
-        t.indexOf("ВОЙТИ В КАБИНУ") !== -1 ||
-        t.indexOf("NAV") !== -1 ||
-        t.indexOf("КАРТА") !== -1 ||
-        t.indexOf("ЕЩЁ") !== -1 ||
-        t.indexOf("ГЛАВНАЯ") !== -1
-      ){
-        entered = true;
-        setTimeout(update, 60);
-        setTimeout(update, 250);
+      if(isEnterElement(n)){
+        setEntered(true);
+        setTimeout(revealDesignHome, 120);
+        setTimeout(update, 200);
         return;
       }
       n = n.parentElement;
@@ -6600,22 +6582,34 @@ function zonesViewZoom(val) {
   }
 
   function patchShowTab(){
-    if(window.__startScreenBottomNavFix) return;
-    window.__startScreenBottomNavFix = true;
+    if(window.__designNavEnterGatePatched) return;
+    window.__designNavEnterGatePatched = true;
 
     if(typeof window.showTab === "function"){
       var old = window.showTab;
       window.showTab = function(){
-        entered = true;
+        // showTab вызывается уже рабочей навигацией — значит кабина открыта
+        setEntered(true);
         var result = old.apply(this, arguments);
-        setTimeout(update, 60);
-        setTimeout(update, 250);
+        setTimeout(update, 50);
         return result;
       };
     }
   }
 
+  function update(){
+    if(isWorkScreen()) setEntered(true);
+
+    // Если ещё не вошли — держим меню скрытым.
+    if(!hasEntered()){
+      document.body.classList.remove("cabin-entered");
+    }
+  }
+
   function init(){
+    // На новой сессии снова показываем чистый старт без меню.
+    document.body.classList.remove("cabin-entered");
+
     document.addEventListener("click", onClick, true);
     patchShowTab();
     update();
@@ -6633,14 +6627,12 @@ function zonesViewZoom(val) {
 
     window.addEventListener("load", function(){
       setTimeout(update, 100);
-      setTimeout(update, 700);
+      setTimeout(update, 600);
       setTimeout(update, 1600);
     });
-
-    setInterval(update, 1200);
   }
 
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
 })();
-// END SAFE ADDON — START SCREEN BOTTOM NAV FIX
+// END SAFE ADDON — DESIGN NAV ENTER GATE
