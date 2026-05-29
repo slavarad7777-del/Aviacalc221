@@ -7265,3 +7265,208 @@ function zonesViewZoom(val) {
   else init();
 })();
 // END SAFE ADDON — ALL TABS HUB
+
+// SAFE ADDON — ALL TABS HUB V2
+(function(){
+  function el(id){return document.getElementById(id)}
+  function safeJson(k,f){try{var r=localStorage.getItem(k);return r?JSON.parse(r):f}catch(e){return f}}
+
+  var groups = [
+    {
+      title:"Полёт",
+      note:"основное",
+      items:[
+        {title:"NAV", tab:"nav-mode", icon:"◉", desc:"Планшет", primary:true},
+        {title:"Карта", tab:"map", icon:"⌖", desc:"OSM / спутник", primary:true},
+        {title:"Чек-листы", tab:"checklists", icon:"☑", desc:"Процедуры"},
+        {title:"Самолёты", tab:"aircraft", icon:"✈", desc:"Профили"}
+      ]
+    },
+    {
+      title:"Навигация",
+      note:"маршрут",
+      items:[
+        {title:"Штурман", tab:"navigator-lite", icon:"✦", desc:"Расчёты", primary:true},
+        {title:"Файл", tab:"file-import", icon:"⇪", desc:"Импорт"},
+        {title:"Маршрут", tab:"route", icon:"↗", desc:"Точки"},
+        {title:"Зоны", tab:"zones", icon:"⬡", desc:"Полигоны"}
+      ]
+    },
+    {
+      title:"Данные",
+      note:"справка",
+      items:[
+        {title:"GPS", tab:"gps-map", icon:"⌁", desc:"Диагностика"},
+        {title:"AIP", tab:"aip", icon:"▤", desc:"Сборники"},
+        {title:"ДА-42Т", tab:"da42t", icon:"◆", desc:"РЛЭ"},
+        {title:"Главная", tab:"home", icon:"⌂", desc:"Старт"}
+      ]
+    }
+  ];
+
+  function status(){
+    var route=safeJson("aviscalc_imported_route_json",[]);
+    var r=Array.isArray(route)?route.length:0;
+
+    var zones=safeJson("aviscalc_imported_zones_json",[]);
+    var z=Array.isArray(zones)?zones.length:0;
+
+    var gps="—";
+    if(window.__aviscalcGpsLastPosition&&window.__aviscalcGpsLastPosition.coords)gps="OK";
+
+    var nav=(el("nav-status")&&el("nav-status").textContent)||"STBY";
+
+    var map={
+      "alltabs-route":r+" WP",
+      "alltabs-zones":z,
+      "alltabs-gps":gps,
+      "alltabs-nav":nav
+    };
+    Object.keys(map).forEach(function(k){
+      var x=el(k); if(x)x.textContent=map[k];
+    });
+  }
+
+  function go(tab){
+    document.body.classList.remove("hub-v2-home-active");
+
+    if(typeof window.showTab==="function"){
+      try{window.showTab(tab);return}catch(e){}
+    }
+
+    document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active")});
+    var page=el("tab-"+tab)||el(tab);
+    if(page)page.classList.add("active");
+  }
+
+  function showHub(){
+    ensureHubV2();
+    document.body.classList.add("hub-v2-home-active");
+
+    document.querySelectorAll(".page").forEach(function(p){
+      p.classList.toggle("active",p.id==="tab-all-tabs-hub");
+    });
+
+    var sc=document.querySelector(".scroll");
+    if(sc)sc.scrollTop=0;
+    status();
+  }
+
+  function tile(m){
+    return '<button class="alltabs-tile '+(m.primary?'primary':'')+'" data-go="'+m.tab+'">'+
+      '<div><div class="ico">'+m.icon+'</div><b>'+m.title+'</b><small>'+m.desc+'</small></div>'+
+    '</button>';
+  }
+
+  function ensureHubV2(){
+    var page=el("tab-all-tabs-hub");
+    if(!page){
+      var scroll=document.querySelector(".scroll");
+      if(!scroll)return;
+      page=document.createElement("div");
+      page.className="page";
+      page.id="tab-all-tabs-hub";
+      scroll.appendChild(page);
+    }
+
+    if(page.dataset.hubV2==="1")return;
+    page.dataset.hubV2="1";
+
+    page.innerHTML =
+      '<div class="alltabs-app">'+
+        '<section class="alltabs-hero">'+
+          '<div class="alltabs-kicker">AVISCALC · CONTROL CENTER</div>'+
+          '<div class="alltabs-title">Все вкладки</div>'+
+          '<div class="alltabs-sub">Главный экран управления. Нижнее меню скрыто — переходы теперь через эти плитки.</div>'+
+        '</section>'+
+        '<section class="alltabs-status">'+
+          '<div class="alltabs-chip"><span>Маршрут</span><b id="alltabs-route">0 WP</b></div>'+
+          '<div class="alltabs-chip"><span>Зоны</span><b id="alltabs-zones">0</b></div>'+
+          '<div class="alltabs-chip"><span>GPS</span><b id="alltabs-gps">—</b></div>'+
+          '<div class="alltabs-chip"><span>NAV</span><b id="alltabs-nav">STBY</b></div>'+
+        '</section>'+
+        groups.map(function(g){
+          return '<section class="hub-v2-group">'+
+            '<div class="hub-v2-group-head"><span>'+g.title+'</span><small>'+g.note+'</small></div>'+
+            '<div class="alltabs-grid">'+g.items.map(tile).join("")+'</div>'+
+          '</section>';
+        }).join("")+
+        '<section class="alltabs-actions">'+
+          '<button class="alltabs-btn primary" id="hub-v2-refresh">Обновить</button>'+
+          '<button class="alltabs-btn" id="hub-v2-compact">Compact</button>'+
+          '<button class="alltabs-btn" id="hub-v2-map">Карта</button>'+
+        '</section>'+
+      '</div>';
+
+    page.querySelectorAll("[data-go]").forEach(function(b){
+      b.addEventListener("click",function(){go(b.dataset.go)});
+    });
+
+    var refresh=el("hub-v2-refresh");
+    if(refresh)refresh.addEventListener("click",status);
+
+    var compact=el("hub-v2-compact");
+    if(compact)compact.addEventListener("click",function(){
+      var c=el("compact-toggle");
+      if(c)c.click();
+      else document.body.classList.toggle("compact-mode");
+    });
+
+    var map=el("hub-v2-map");
+    if(map)map.addEventListener("click",function(){go("map")});
+
+    status();
+  }
+
+  function ensureHomeButton(){
+    if(el("hub-v2-home-btn"))return;
+    var btn=document.createElement("button");
+    btn.id="hub-v2-home-btn";
+    btn.className="hub-v2-home-btn";
+    btn.type="button";
+    btn.textContent="Все";
+    btn.addEventListener("click",function(e){
+      e.preventDefault();
+      showHub();
+    });
+    document.body.appendChild(btn);
+  }
+
+  function patchShowTab(){
+    if(window.__hubV2ShowTabPatched)return;
+    window.__hubV2ShowTabPatched=true;
+
+    if(typeof window.showTab==="function"){
+      var old=window.showTab;
+      window.showTab=function(t){
+        ensureHubV2();
+
+        if(t==="all-tabs-hub" || t==="hub-v2"){
+          showHub();
+          return;
+        }
+
+        document.body.classList.remove("hub-v2-home-active");
+        var result=old.apply(this,arguments);
+        setTimeout(status,80);
+        return result;
+      };
+    }
+  }
+
+  function init(){
+    document.body.classList.add("hub-v2");
+    ensureHubV2();
+    ensureHomeButton();
+    patchShowTab();
+
+    // Делаем хаб главным рабочим экраном после загрузки, но не вмешиваемся в boot мгновенно.
+    setTimeout(showHub,1200);
+
+    setInterval(status,12000);
+  }
+
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);
+  else init();
+})();
+// END SAFE ADDON — ALL TABS HUB V2
