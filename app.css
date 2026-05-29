@@ -4375,3 +4375,352 @@ body.retro-true #tab-nav-mode .ph{display:none!important}
 @media(max-width:980px){.nav-grid{grid-template-columns:1fr}}
 @media(max-width:620px){.nav-title{font-size:24px;letter-spacing:3px}.nav-primary-grid,.nav-mini-grid,.nav-actions{grid-template-columns:1fr}.nav-map-wrap{min-height:360px}#nav-mode-canvas{height:360px}.nav-big b{font-size:24px}}
 /* END SAFE ADDON — NAV MODE FLIGHT PAD */
+
+/* SAFE ADDON — COMPACT MODE V1 */
+.compact-toggle{
+  position:fixed;
+  right:10px;
+  top:calc(env(safe-area-inset-top, 0px) + 10px);
+  z-index:100000;
+  border:1px solid #28401e;
+  background:linear-gradient(180deg,#172013,#050905);
+  color:var(--tx,#c9f6b8);
+  border-radius:4px;
+  font-family:var(--mono,monospace);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  padding:8px 9px;
+  cursor:pointer;
+  font-size:10px;
+  box-shadow:0 0 14px rgba(157,255,97,.12), inset 0 1px 0 rgba(255,255,255,.04), inset 0 -8px 12px rgba(0,0,0,.32);
+}
+.compact-toggle.active{
+  color:var(--ac,#9dff61);
+  border-color:var(--ac2,#64c93a);
+  background:linear-gradient(180deg,#173a12,#061406);
+  text-shadow:0 0 8px var(--lcd-glow,rgba(157,255,97,.6));
+}
+
+.compact-status{
+  position:fixed;
+  left:10px;
+  right:70px;
+  top:calc(env(safe-area-inset-top, 0px) + 10px);
+  z-index:99999;
+  display:none;
+  border:1px solid rgba(157,255,97,.20);
+  background:rgba(1,7,1,.88);
+  color:var(--mu,#6f9f63);
+  border-radius:4px;
+  font-family:var(--mono,monospace);
+  font-size:9px;
+  line-height:1;
+  letter-spacing:.8px;
+  padding:9px 10px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+body.compact-mode .compact-status{
+  display:block;
+}
+
+body.compact-mode{
+  --compact-pad:8px;
+}
+
+body.compact-mode .shell,
+body.compact-mode .app,
+body.compact-mode main,
+body.compact-mode .scroll{
+  padding-top:34px!important;
+}
+
+body.compact-mode .page{
+  padding:8px!important;
+}
+
+body.compact-mode .hero,
+body.compact-mode .fi-hero,
+body.compact-mode .gps-hero,
+body.compact-mode .nav-hero,
+body.compact-mode .da42t-hero,
+body.compact-mode .da42-hero{
+  min-height:auto!important;
+  padding:10px!important;
+  margin-bottom:8px!important;
+}
+
+body.compact-mode .hero::before,
+body.compact-mode .fi-hero::before,
+body.compact-mode .gps-hero::before,
+body.compact-mode .nav-hero::before{
+  opacity:.45;
+}
+
+body.compact-mode .hero h1,
+body.compact-mode .fi-title,
+body.compact-mode .gps-title,
+body.compact-mode .nav-title,
+body.compact-mode .da42t-title,
+body.compact-mode .da42-title,
+body.compact-mode .sp-title,
+body.compact-mode .title{
+  font-size:20px!important;
+  letter-spacing:2px!important;
+  line-height:1.05!important;
+}
+
+body.compact-mode .fi-kicker,
+body.compact-mode .gps-kicker,
+body.compact-mode .nav-kicker,
+body.compact-mode .da42t-kicker,
+body.compact-mode .da42-kicker,
+body.compact-mode .kicker{
+  font-size:8px!important;
+  letter-spacing:1.2px!important;
+  margin-bottom:4px!important;
+}
+
+body.compact-mode .fi-subtitle,
+body.compact-mode .gps-subtitle,
+body.compact-mode .nav-subtitle,
+body.compact-mode .da42t-subtitle,
+body.compact-mode .da42-subtitle,
+body.compact-mode .subtitle,
+body.compact-mode .hero p{
+  display:none!important;
+}
+
+body.compact-mode .panel,
+body.compact-mode .fi-panel,
+body.compact-mode .gps-panel,
+body.compact-mode .nav-panel,
+body.compact-mode .da42t-panel,
+body.compact-mode .da42-panel,
+body.compact-mode .card{
+  border-radius:3px!important;
+}
+
+body.compact-mode .panel-head,
+body.compact-mode .fi-panel-head,
+body.compact-mode .gps-panel-head,
+body.compact-mode .nav-panel-head,
+body.compact-mode .da42t-panel-head,
+body.compact-mode .da42-panel-head{
+  padding:8px 9px!important;
+  font-size:9px!important;
+  letter-spacing:1.2px!important;
+}
+
+body.compact-mode .panel-body,
+body.compact-mode .fi-panel-body,
+body.compact-mode .gps-panel-body,
+body.compact-mode .nav-panel-body,
+body.compact-mode .da42t-panel-body,
+body.compact-mode .da42-panel-body{
+  padding:8px!important;
+  gap:8px!important;
+}
+
+body.compact-mode .grid,
+body.compact-mode .fi-grid,
+body.compact-mode .gps-grid,
+body.compact-mode .nav-grid,
+body.compact-mode .da42t-grid,
+body.compact-mode .da42-grid{
+  gap:8px!important;
+}
+
+body.compact-mode .fi-kpi-grid,
+body.compact-mode .gps-kpi-grid,
+body.compact-mode .nav-mini-grid,
+body.compact-mode .da42t-grid,
+body.compact-mode .da42-grid{
+  gap:6px!important;
+}
+
+body.compact-mode .kpi,
+body.compact-mode .fi-kpi,
+body.compact-mode .gps-kpi,
+body.compact-mode .nav-mini,
+body.compact-mode .da42t-card,
+body.compact-mode .da42-card,
+body.compact-mode .card{
+  padding:8px!important;
+}
+
+body.compact-mode .kpi span,
+body.compact-mode .fi-kpi span,
+body.compact-mode .gps-kpi span,
+body.compact-mode .nav-mini span,
+body.compact-mode .da42t-card span,
+body.compact-mode .da42-card span{
+  font-size:7px!important;
+  letter-spacing:.8px!important;
+}
+
+body.compact-mode .kpi b,
+body.compact-mode .fi-kpi b,
+body.compact-mode .gps-kpi b,
+body.compact-mode .nav-mini b,
+body.compact-mode .da42t-card b,
+body.compact-mode .da42-card b{
+  font-size:14px!important;
+  margin-top:4px!important;
+}
+
+body.compact-mode .nav-primary-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:6px!important;
+}
+
+body.compact-mode .nav-big{
+  padding:9px!important;
+}
+
+body.compact-mode .nav-big b{
+  font-size:24px!important;
+  margin-top:4px!important;
+}
+
+body.compact-mode .nav-big small{
+  display:none!important;
+}
+
+body.compact-mode .nav-actions,
+body.compact-mode .gps-actions,
+body.compact-mode .fi-actions,
+body.compact-mode .da42t-actions,
+body.compact-mode .da42-actions{
+  gap:6px!important;
+}
+
+body.compact-mode .nav-btn,
+body.compact-mode .gps-btn,
+body.compact-mode .fi-btn,
+body.compact-mode .da42t-btn,
+body.compact-mode .da42-btn,
+body.compact-mode button{
+  padding:8px 7px!important;
+  font-size:9px!important;
+  letter-spacing:.7px!important;
+}
+
+body.compact-mode .nav-map-wrap,
+body.compact-mode .gps-map-wrap,
+body.compact-mode .lfm-canvas-wrap{
+  min-height:300px!important;
+}
+
+body.compact-mode #nav-mode-canvas,
+body.compact-mode #gps-map-canvas,
+body.compact-mode #leaflet-fallback-canvas{
+  height:300px!important;
+}
+
+body.compact-mode .nav-route-table-wrap,
+body.compact-mode .fi-table-wrap,
+body.compact-mode .da42t-table-wrap,
+body.compact-mode .da42-table-wrap{
+  max-height:180px!important;
+}
+
+body.compact-mode table,
+body.compact-mode .nav-route-table,
+body.compact-mode .fi-table,
+body.compact-mode .da42t-table,
+body.compact-mode .da42-table{
+  font-size:9px!important;
+}
+
+body.compact-mode th,
+body.compact-mode td{
+  padding:5px 5px!important;
+}
+
+body.compact-mode .note,
+body.compact-mode .fi-note,
+body.compact-mode .gps-note,
+body.compact-mode .nav-note,
+body.compact-mode .da42t-note,
+body.compact-mode .da42-note{
+  padding:8px 9px!important;
+  font-size:9px!important;
+  line-height:1.45!important;
+}
+
+body.compact-mode .nav-log,
+body.compact-mode .gps-log,
+body.compact-mode .fi-log,
+body.compact-mode .lfm-log{
+  min-height:58px!important;
+  max-height:95px!important;
+  font-size:9px!important;
+  padding:7px!important;
+}
+
+body.compact-mode .retro-nav{
+  gap:4px!important;
+  padding:5px!important;
+  overflow-x:auto!important;
+  scrollbar-width:none;
+}
+body.compact-mode .retro-nav::-webkit-scrollbar{display:none}
+
+body.compact-mode .retro-nav-btn,
+body.compact-mode .tab,
+body.compact-mode .nav-item{
+  min-width:54px!important;
+  padding:6px 5px!important;
+  border-radius:3px!important;
+}
+
+body.compact-mode .retro-nav-btn .ico,
+body.compact-mode .nav-item .ico{
+  font-size:13px!important;
+}
+
+body.compact-mode .retro-nav-btn b,
+body.compact-mode .nav-item b{
+  font-size:8px!important;
+  letter-spacing:.6px!important;
+}
+
+body.compact-mode .retro-nav-btn small,
+body.compact-mode .nav-item small{
+  display:none!important;
+}
+
+body.compact-mode .aircraft-card,
+body.compact-mode .plane-card,
+body.compact-mode .aircraft-item{
+  padding:8px!important;
+  min-height:auto!important;
+}
+
+body.compact-mode .aircraft-card p,
+body.compact-mode .plane-card p,
+body.compact-mode .aircraft-item p{
+  display:none!important;
+}
+
+@media(max-width:620px){
+  body.compact-mode .nav-grid,
+  body.compact-mode .gps-grid,
+  body.compact-mode .fi-grid{
+    grid-template-columns:1fr!important;
+  }
+  body.compact-mode .nav-mini-grid,
+  body.compact-mode .gps-kpi-grid,
+  body.compact-mode .fi-kpi-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  body.compact-mode .nav-actions,
+  body.compact-mode .gps-actions,
+  body.compact-mode .fi-actions{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+}
+/* END SAFE ADDON — COMPACT MODE V1 */

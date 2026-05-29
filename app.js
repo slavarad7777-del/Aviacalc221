@@ -6283,3 +6283,130 @@ function zonesViewZoom(val) {
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
 // END SAFE ADDON — NAV MODE FLIGHT PAD
+
+// SAFE ADDON — COMPACT MODE V1
+(function(){
+  var KEY = "aviscalc_compact_mode_v1";
+
+  function el(id){ return document.getElementById(id); }
+
+  function isCompact(){
+    try{ return localStorage.getItem(KEY) === "1"; }catch(e){ return false; }
+  }
+
+  function saveCompact(v){
+    try{ localStorage.setItem(KEY, v ? "1" : "0"); }catch(e){}
+  }
+
+  function activeTabName(){
+    var active = document.querySelector(".retro-nav-btn.active b") ||
+                 document.querySelector(".nav-item.active b") ||
+                 document.querySelector(".tab.active");
+    var tab = active ? active.textContent.trim() : "AvisCalc";
+
+    var gps = "GPS —";
+    try{
+      if(window.__aviscalcGpsLastPosition && window.__aviscalcGpsLastPosition.coords){
+        var c = window.__aviscalcGpsLastPosition.coords;
+        gps = "GPS ±" + Math.round(c.accuracy || 0) + "м";
+      }
+    }catch(e){}
+
+    var nav = "NAV";
+    var navStatus = document.getElementById("nav-status");
+    if(navStatus) nav += " " + navStatus.textContent.trim();
+
+    var ac = "ДА-42Т";
+    try{
+      var activeAircraft = JSON.parse(localStorage.getItem("aviscalc_active_aircraft") || "null");
+      if(activeAircraft && activeAircraft.name) ac = activeAircraft.name;
+    }catch(e){}
+
+    var time = new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+    return ac + " | " + gps + " | " + nav + " | " + tab + " | " + time;
+  }
+
+  function updateStatus(){
+    var s = el("compact-status");
+    if(s) s.textContent = activeTabName();
+
+    var btn = el("compact-toggle");
+    if(btn){
+      var on = document.body.classList.contains("compact-mode");
+      btn.classList.toggle("active", on);
+      btn.textContent = on ? "FULL" : "COMPACT";
+      btn.title = on ? "Выключить компактный режим" : "Включить компактный режим";
+    }
+  }
+
+  function applyCompact(v){
+    document.body.classList.toggle("compact-mode", !!v);
+    saveCompact(!!v);
+    updateStatus();
+
+    // redraw canvases after layout changes
+    setTimeout(function(){
+      window.dispatchEvent(new Event("resize"));
+    }, 120);
+  }
+
+  function toggleCompact(){
+    applyCompact(!document.body.classList.contains("compact-mode"));
+  }
+
+  function ensureControls(){
+    if(!el("compact-toggle")){
+      var btn = document.createElement("button");
+      btn.id = "compact-toggle";
+      btn.className = "compact-toggle";
+      btn.type = "button";
+      btn.textContent = "COMPACT";
+      btn.addEventListener("click", toggleCompact);
+      document.body.appendChild(btn);
+    }
+
+    if(!el("compact-status")){
+      var status = document.createElement("div");
+      status.id = "compact-status";
+      status.className = "compact-status";
+      status.textContent = "AvisCalc";
+      document.body.appendChild(status);
+    }
+  }
+
+  function patchShowTab(){
+    if(window.__compactModeShowTabPatched) return;
+    window.__compactModeShowTabPatched = true;
+
+    if(typeof window.showTab === "function"){
+      var old = window.showTab;
+      window.showTab = function(){
+        var result = old.apply(this, arguments);
+        setTimeout(updateStatus, 80);
+        return result;
+      };
+    }
+  }
+
+  function addKeyboardShortcut(){
+    document.addEventListener("keydown", function(e){
+      if((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === "k"){
+        e.preventDefault();
+        toggleCompact();
+      }
+    });
+  }
+
+  function init(){
+    ensureControls();
+    patchShowTab();
+    addKeyboardShortcut();
+    applyCompact(isCompact());
+    updateStatus();
+    setInterval(updateStatus, 15000);
+  }
+
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+// END SAFE ADDON — COMPACT MODE V1
