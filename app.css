@@ -5307,3 +5307,57 @@ body.retro-true #tab-navigator-lite .ph{display:none!important}
   }
 }
 /* END SAFE ADDON — ONLINE MAP MODE */
+
+/* SAFE ADDON — UI COMPACT POLISH V1 */
+body.ui-polish-v1{--ui-radius:10px;--ui-pad:10px;--ui-gap:9px}
+body.ui-polish-v1 .page{padding:10px!important}
+body.ui-polish-v1 .grid,body.ui-polish-v1 .nav-grid,body.ui-polish-v1 .gps-grid,body.ui-polish-v1 .fi-grid,body.ui-polish-v1 .navlite-grid{gap:var(--ui-gap)!important}
+body.ui-polish-v1 .hero,body.ui-polish-v1 .nav-hero,body.ui-polish-v1 .gps-hero,body.ui-polish-v1 .fi-hero,body.ui-polish-v1 .navlite-hero,body.ui-polish-v1 .da42t-hero,body.ui-polish-v1 .da42-hero{min-height:auto!important;padding:12px!important;border-radius:var(--ui-radius)!important;margin-bottom:8px!important}
+body.ui-polish-v1 .nav-title,body.ui-polish-v1 .gps-title,body.ui-polish-v1 .fi-title,body.ui-polish-v1 .navlite-title,body.ui-polish-v1 .da42t-title,body.ui-polish-v1 .da42-title,body.ui-polish-v1 .title,body.ui-polish-v1 h1{font-size:22px!important;line-height:1.05!important;letter-spacing:2px!important}
+body.ui-polish-v1 .nav-subtitle,body.ui-polish-v1 .gps-subtitle,body.ui-polish-v1 .fi-subtitle,body.ui-polish-v1 .navlite-sub,body.ui-polish-v1 .subtitle,body.ui-polish-v1 .hero p{font-size:10px!important;line-height:1.45!important;margin-top:6px!important}
+body.ui-polish-v1 .nav-kicker,body.ui-polish-v1 .gps-kicker,body.ui-polish-v1 .fi-kicker,body.ui-polish-v1 .navlite-kicker,body.ui-polish-v1 .kicker{font-size:8px!important;letter-spacing:1.4px!important;margin-bottom:5px!important}
+body.ui-polish-v1 .panel,body.ui-polish-v1 .card,body.ui-polish-v1 .nav-panel,body.ui-polish-v1 .gps-panel,body.ui-polish-v1 .fi-panel,body.ui-polish-v1 .navlite-panel,body.ui-polish-v1 .da42t-panel,body.ui-polish-v1 .da42-panel{border-radius:var(--ui-radius)!important}
+body.ui-polish-v1 .panel-head,body.ui-polish-v1 .nav-panel-head,body.ui-polish-v1 .gps-panel-head,body.ui-polish-v1 .fi-panel-head,body.ui-polish-v1 .navlite-head,body.ui-polish-v1 .da42t-panel-head,body.ui-polish-v1 .da42-panel-head{padding:8px 10px!important;font-size:9px!important;letter-spacing:1.4px!important}
+body.ui-polish-v1 .panel-body,body.ui-polish-v1 .nav-panel-body,body.ui-polish-v1 .gps-panel-body,body.ui-polish-v1 .fi-panel-body,body.ui-polish-v1 .navlite-body,body.ui-polish-v1 .da42t-panel-body,body.ui-polish-v1 .da42-panel-body{padding:var(--ui-pad)!important;gap:var(--ui-gap)!important}
+body.ui-polish-v1 .kpi,body.ui-polish-v1 .gps-kpi,body.ui-polish-v1 .fi-kpi,body.ui-polish-v1 .nav-mini,body.ui-polish-v1 .navlite-kpi,body.ui-polish-v1 .da42t-card,body.ui-polish-v1 .da42-card,body.ui-polish-v1 .aircraft-card,body.ui-polish-v1 .plane-card,body.ui-polish-v1 .aircraft-item{padding:9px!important;border-radius:9px!important}
+body.ui-polish-v1 .kpi span,body.ui-polish-v1 .gps-kpi span,body.ui-polish-v1 .fi-kpi span,body.ui-polish-v1 .nav-mini span,body.ui-polish-v1 .navlite-kpi span,body.ui-polish-v1 .da42t-card span,body.ui-polish-v1 .da42-card span{font-size:7px!important;letter-spacing:.9px!important}
+body.ui-polish-v1 .kpi b,body.ui-polish-v1 .gps-kpi b,body.ui-polish-v1 .fi-kpi b,body.ui-polish-v1 .nav-mini b,body.ui-polish-v1 .navlite-kpi b,body.ui-polish-v1 .da42t-card b,body.ui-polish-v1 .da42-card b{font-size:15px!important;margin-top:4px!important}
+body.ui-polish-v1 .nav-primary-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important}
+body.ui-polish-v1 .nav-big{padding:10px!important;border-radius:9px!important;min-height:72px!important}
+body.ui-polish-v1 .nav-big span{font-size:7px!important;letter-spacing:.9px!important}
+body.ui-polish-v1 .nav-big b{font-size:22px!important;margin-top:5px!important}
+body.ui-polish-v1 .nav-big small{font-size:8px!important;margin-top:4px!important}
+body.ui-polish-v1 .nav-mini-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important}
+body.ui-polish-v1 .nav-actions{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px!important}
+body.ui-polish-v1 .nav-btn{padding:8px 6px!important;font-size:9px!important;letter-spacing:.7px!important;border-radius:8px!important}
+body.ui-polish-v1 .nav-map-wrap{min-height:330px!important}
+body.ui-polish-v1 #nav-mode-canvas{height:330px!important}
+body.ui-polish-v1 .nav-route-table-wrap{max-height:170px!important}
+body.ui-polish-v1 .nav-log{min-height:48px!important;max-height:76px!important;font-size:9px!important;padding:7px!important}
+body.ui-polish-v1 .online-map-shell{gap:8px!important;padding:8px!important}
+body.ui-polish-v1 .online-map-toolbar{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+body.ui-polish-v1 .online-map-btn{padding:8px 6px!important;font-size:9px!important;border-radius:8px!important}
+body.ui-polish-v1 .online-map-status{padding:7px 9px!important;font-size:9px!important;border-radius:8px!important}
+body.ui-polish-v1 #online-leaflet-map{height:500px!important;min-height:390px!important;border-radius:10px!important}
+body.ui-polish-v1 .online-map-fallback{min-height:390px!important;border-radius:10px!important}
+body.ui-polish-v1 #online-fallback-canvas{height:390px!important}
+body.ui-polish-v1 .online-map-log{min-height:42px!important;max-height:64px!important;font-size:9px!important;padding:7px!important}
+body.ui-polish-v1 .navlite-row{gap:7px!important}
+body.ui-polish-v1 .navlite-field{gap:4px!important}
+body.ui-polish-v1 .navlite-field label{font-size:7px!important}
+body.ui-polish-v1 .navlite-field input,body.ui-polish-v1 .navlite-field textarea,body.ui-polish-v1 .navlite-field select{padding:8px 9px!important;font-size:11px!important;border-radius:8px!important}
+body.ui-polish-v1 .navlite-field textarea{min-height:72px!important}
+body.ui-polish-v1 .navlite-btn{padding:8px!important;font-size:9px!important;border-radius:8px!important}
+body.ui-polish-v1 .navlite-result{min-height:44px!important;padding:8px!important;font-size:10px!important;border-radius:8px!important}
+body.ui-polish-v1 table,body.ui-polish-v1 .nav-route-table,body.ui-polish-v1 .fi-table,body.ui-polish-v1 .da42t-table,body.ui-polish-v1 .da42-table{font-size:9px!important}
+body.ui-polish-v1 th,body.ui-polish-v1 td{padding:5px 6px!important}
+body.ui-polish-v1 .retro-nav{gap:5px!important;padding:6px!important;overflow-x:auto!important;scrollbar-width:none}
+body.ui-polish-v1 .retro-nav::-webkit-scrollbar{display:none}
+body.ui-polish-v1 .retro-nav-btn{min-width:68px!important;padding:7px 6px!important;border-radius:9px!important}
+body.ui-polish-v1 .retro-nav-btn .ico{font-size:14px!important}
+body.ui-polish-v1 .retro-nav-btn b{font-size:8px!important;letter-spacing:.7px!important}
+body.ui-polish-v1 .retro-nav-btn small{font-size:7px!important}
+body.ui-polish-v1 .note,body.ui-polish-v1 .gps-note,body.ui-polish-v1 .nav-note,body.ui-polish-v1 .fi-note,body.ui-polish-v1 .da42t-note,body.ui-polish-v1 .da42-note{padding:8px 9px!important;font-size:9px!important;line-height:1.45!important;border-radius:8px!important}
+@media(max-width:760px){body.ui-polish-v1 .nav-primary-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}body.ui-polish-v1 .nav-mini-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}body.ui-polish-v1 .nav-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:620px){body.ui-polish-v1 .page{padding:8px!important}body.ui-polish-v1 .nav-title,body.ui-polish-v1 .gps-title,body.ui-polish-v1 .fi-title,body.ui-polish-v1 .navlite-title{font-size:20px!important}body.ui-polish-v1 #online-leaflet-map{height:430px!important;min-height:350px!important}body.ui-polish-v1 .online-map-fallback,body.ui-polish-v1 #online-fallback-canvas{height:350px!important;min-height:350px!important}body.ui-polish-v1 .nav-map-wrap,body.ui-polish-v1 #nav-mode-canvas{height:300px!important;min-height:300px!important}body.ui-polish-v1 .navlite-grid{gap:8px!important}}
+/* END SAFE ADDON — UI COMPACT POLISH V1 */

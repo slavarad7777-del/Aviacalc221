@@ -7072,3 +7072,11 @@ function zonesViewZoom(val) {
   else init();
 })();
 // END SAFE ADDON — ONLINE MAP MODE
+
+// SAFE ADDON — UI COMPACT POLISH V1
+(function(){
+  function init(){ document.body.classList.add("ui-polish-v1"); }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+// END SAFE ADDON — UI COMPACT POLISH V1
