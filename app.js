@@ -6430,3 +6430,98 @@ function zonesViewZoom(val) {
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
 // END SAFE ADDON — DESIGN HUB V2
+
+// SAFE ADDON — HIDE DESIGN NAV ON START SCREENS
+(function(){
+  function activePage(){
+    return document.querySelector(".page.active") ||
+           document.querySelector(".screen.active") ||
+           document.querySelector("[data-page].active") ||
+           document.querySelector(".active");
+  }
+
+  function isStartScreen(node){
+    if(!node) return false;
+
+    var id = String(node.id || "").toLowerCase();
+    var cls = String(node.className || "").toLowerCase();
+    var txt = String(node.textContent || "").replace(/\s+/g, " ").toUpperCase();
+
+    // Первый экран загрузки AVIS OS
+    if(txt.includes("AVIS OS")) return true;
+    if(txt.includes("ЗАПУСК TACTICAL INTERFACE")) return true;
+    if(txt.includes("ЭКОСИСТЕМА АКТИВНА")) return true;
+
+    // Старый красивый главный экран с входом в кабину
+    if(txt.includes("AVIS РАСЧ") && txt.includes("ВОЙТИ В КАБИНУ")) return true;
+    if(txt.includes("БЕЗ НАВИГАЦИИ") && txt.includes("НЕТ АВИАЦИИ")) return true;
+    if(txt.includes("ШТУРМАНСКИЙ КАЛЬКУЛЯТОР") && txt.includes("ВОЙТИ В КАБИНУ")) return true;
+
+    // По id/class, если экран называется splash/intro/boot/start
+    if(/splash|intro|boot|start|welcome/.test(id)) return true;
+    if(/splash|intro|boot|start|welcome/.test(cls)) return true;
+
+    return false;
+  }
+
+  function update(){
+    var page = activePage();
+
+    // Иногда стартовый экран не помечен active, но виден в DOM.
+    var shouldHide = isStartScreen(page);
+
+    if(!shouldHide){
+      var candidates = Array.from(document.querySelectorAll(".page,.screen,section,main > div"));
+      shouldHide = candidates.some(function(n){
+        var style = window.getComputedStyle(n);
+        if(style.display === "none" || style.visibility === "hidden" || Number(style.opacity) === 0) return false;
+        var r = n.getBoundingClientRect();
+        if(r.width < 40 || r.height < 40) return false;
+        return isStartScreen(n);
+      });
+    }
+
+    document.body.classList.toggle("hide-design-bottom", !!shouldHide);
+  }
+
+  function patchShowTab(){
+    if(window.__hideDesignBottomPatch) return;
+    window.__hideDesignBottomPatch = true;
+
+    if(typeof window.showTab === "function"){
+      var old = window.showTab;
+      window.showTab = function(){
+        var result = old.apply(this, arguments);
+        setTimeout(update, 50);
+        setTimeout(update, 250);
+        return result;
+      };
+    }
+  }
+
+  function init(){
+    patchShowTab();
+    update();
+
+    var obs = new MutationObserver(function(){
+      update();
+    });
+
+    obs.observe(document.body, {
+      childList:true,
+      subtree:true,
+      attributes:true,
+      attributeFilter:["class","style"]
+    });
+
+    window.addEventListener("load", function(){
+      setTimeout(update, 100);
+      setTimeout(update, 800);
+      setTimeout(update, 1800);
+    });
+  }
+
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+// END SAFE ADDON — HIDE DESIGN NAV ON START SCREENS
