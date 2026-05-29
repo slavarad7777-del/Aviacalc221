@@ -6438,3 +6438,637 @@ function zonesViewZoom(val) {
   else init();
 })();
 // END SAFE ADDON — SIMPLE EFB DESIGN
+
+// SAFE ADDON — NAVIGATOR LITE
+(function(){
+  function el(id){return document.getElementById(id)}
+  function num(id){var x=Number((el(id)&&el(id).value)||0);return isFinite(x)?x:0}
+  function set(id,txt){var x=el(id);if(x)x.innerHTML=txt}
+  function rad(d){return d*Math.PI/180}
+  function distKm(a,b){
+    var R=6371,dLat=rad(b.lat-a.lat),dLon=rad(b.lon-a.lon),la1=rad(a.lat),la2=rad(b.lat);
+    var s=Math.sin(dLat/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dLon/2)**2;
+    return 2*R*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
+  }
+  function safeJson(k,f){try{var r=localStorage.getItem(k);return r?JSON.parse(r):f}catch(e){return f}}
+  function pt(p){
+    if(!p)return null;
+    var lat=Number(p.lat??p.latitude),lon=Number(p.lon??p.lng??p.longitude);
+    if(!isFinite(lat)||!isFinite(lon))return null;
+    return{lat:lat,lon:lon,name:p.name||p.title||""};
+  }
+  function hhmm(hours){
+    if(!isFinite(hours)||hours<0)return"—";
+    var m=Math.round(hours*60);
+    return Math.floor(m/60)+":"+String(m%60).padStart(2,"0");
+  }
+
+  function calcTime(){
+    var dist=num("nl-dist"), speed=num("nl-speed");
+    if(dist<=0||speed<=0){set("nl-time-result","Введите дистанцию и скорость.");return}
+    var h=dist/speed;
+    set("nl-time-result","<b>Время:</b> "+hhmm(h)+"\n<b>Минут:</b> "+Math.round(h*60)+"\n<b>NM:</b> "+(dist/1.852).toFixed(1));
+  }
+
+  function calcFuel(){
+    var time=num("nl-fuel-time"), flow=num("nl-fuel-flow"), reserve=num("nl-fuel-reserve"), taxi=num("nl-fuel-taxi");
+    if(time<=0||flow<=0){set("nl-fuel-result","Введите время и расход.");return}
+    var main=time/60*flow;
+    var res=reserve/60*flow;
+    var total=main+res+taxi;
+    set("nl-fuel-result","<b>Основное:</b> "+main.toFixed(1)+"\n<b>Резерв:</b> "+res.toFixed(1)+"\n<b>Руление:</b> "+taxi.toFixed(1)+"\n<b>Итого:</b> "+total.toFixed(1));
+  }
+
+  function dmsToDec(){
+    var raw=(el("nl-dms")&&el("nl-dms").value)||"";
+    var s=raw.trim().toUpperCase().replace(/,/g," ");
+    var sign=/[SWЮЗW]/.test(s)?-1:1;
+    var nums=s.match(/\d+(?:\.\d+)?/g);
+    if(!nums||!nums.length){set("nl-coord-result","Не вижу координату.");return}
+    var deg=Number(nums[0]||0), min=Number(nums[1]||0), sec=Number(nums[2]||0);
+    var dec=sign*(deg+min/60+sec/3600);
+    set("nl-coord-result","<b>Decimal:</b> "+dec.toFixed(6));
+  }
+
+  function decToDms(){
+    var dec=Number((el("nl-dec")&&el("nl-dec").value)||0);
+    if(!isFinite(dec)){set("nl-coord-result","Введите decimal координату.");return}
+    var sign=dec<0?"−":"";
+    dec=Math.abs(dec);
+    var d=Math.floor(dec);
+    var mFloat=(dec-d)*60;
+    var m=Math.floor(mFloat);
+    var s=(mFloat-m)*60;
+    set("nl-coord-result","<b>DMS:</b> "+sign+d+"° "+m+"' "+s.toFixed(1)+'"');
+  }
+
+  function parseMetar(){
+    var raw=((el("nl-metar")&&el("nl-metar").value)||"").trim().toUpperCase();
+    if(!raw){set("nl-metar-result","Вставь METAR строку вручную.");return}
+
+    var wind=raw.match(/\b(\d{3}|VRB)(\d{2,3})(G\d{2,3})?KT\b/);
+    var vis=raw.match(/\b(\d{4})\b/);
+    var qnh=raw.match(/\bQ(\d{4})\b/);
+    var temp=raw.match(/\b(M?\d{2})\/(M?\d{2})\b/);
+    var cavok=/\bCAVOK\b/.test(raw);
+
+    function mtemp(x){return x?x.replace("M","-"):"—"}
+
+    var out=[];
+    out.push("<b>METAR:</b>");
+    out.push("Ветер: "+(wind?(wind[1]+"° "+wind[2]+" kt"+(wind[3]?(" порывы "+wind[3].slice(1)+" kt"):"")):"—"));
+    out.push("Видимость: "+(cavok?"CAVOK":(vis?(vis[1]+" м"):"—")));
+    out.push("QNH: "+(qnh?(qnh[1]+" гПа"):"—"));
+    out.push("Темп./точка росы: "+(temp?(mtemp(temp[1])+" / "+mtemp(temp[2])+" °C"):"—"));
+    set("nl-metar-result",out.join("\n"));
+  }
+
+  function routeSummary(){
+    var route=safeJson("aviscalc_imported_route_json",[]);
+    route=Array.isArray(route)?route.map(pt).filter(Boolean):[];
+    if(route.length<2){
+      set("nl-route-result","Маршрут не найден. Импортируй KML/GPX/GeoJSON во вкладке «Файл».");
+      set("nl-route-wp","0");
+      set("nl-route-km","—");
+      set("nl-route-ete","—");
+      return;
+    }
+    var total=0;
+    for(var i=1;i<route.length;i++)total+=distKm(route[i-1],route[i]);
+    var speed=num("nl-route-speed")||180;
+    set("nl-route-wp",String(route.length));
+    set("nl-route-km",total.toFixed(1)+" км");
+    set("nl-route-ete",hhmm(total/speed));
+    set("nl-route-result","<b>Маршрут:</b> "+route.length+" WP\n<b>Дистанция:</b> "+total.toFixed(1)+" км / "+(total/1.852).toFixed(1)+" NM\n<b>ETE @ "+speed+" км/ч:</b> "+hhmm(total/speed));
+  }
+
+  function ensureTab(){
+    if(el("tab-navigator-lite"))return;
+    var scroll=document.querySelector(".scroll");
+    if(!scroll)return;
+
+    var page=document.createElement("div");
+    page.className="page";
+    page.id="tab-navigator-lite";
+    page.innerHTML=
+      '<div class="navlite-app">'+
+        '<section class="navlite-hero">'+
+          '<div class="navlite-kicker">PRO-STYLE TOOLS · OFFLINE</div>'+
+          '<div class="navlite-title">Штурман Lite</div>'+
+          '<div class="navlite-sub">Набор быстрых инструментов в стиле авиационного планшета: время, топливо, координаты, METAR и сводка маршрута.</div>'+
+        '</section>'+
+        '<section class="navlite-grid">'+
+          '<div class="navlite-panel">'+
+            '<div class="navlite-head"><span>Время / Дистанция</span><small>SDT</small></div>'+
+            '<div class="navlite-body">'+
+              '<div class="navlite-row">'+
+                '<div class="navlite-field"><label>Дистанция, км</label><input id="nl-dist" type="number" value="120"></div>'+
+                '<div class="navlite-field"><label>Скорость, км/ч</label><input id="nl-speed" type="number" value="180"></div>'+
+              '</div>'+
+              '<button class="navlite-btn primary" id="nl-time-btn">Рассчитать</button>'+
+              '<div class="navlite-result" id="nl-time-result">Готово.</div>'+
+            '</div>'+
+          '</div>'+
+          '<div class="navlite-panel">'+
+            '<div class="navlite-head"><span>Топливо</span><small>PLAN</small></div>'+
+            '<div class="navlite-body">'+
+              '<div class="navlite-row">'+
+                '<div class="navlite-field"><label>Время, мин</label><input id="nl-fuel-time" type="number" value="60"></div>'+
+                '<div class="navlite-field"><label>Расход / час</label><input id="nl-fuel-flow" type="number" value="35"></div>'+
+                '<div class="navlite-field"><label>Резерв, мин</label><input id="nl-fuel-reserve" type="number" value="30"></div>'+
+                '<div class="navlite-field"><label>Руление</label><input id="nl-fuel-taxi" type="number" value="5"></div>'+
+              '</div>'+
+              '<button class="navlite-btn primary" id="nl-fuel-btn">Рассчитать</button>'+
+              '<div class="navlite-result" id="nl-fuel-result">Готово.</div>'+
+            '</div>'+
+          '</div>'+
+          '<div class="navlite-panel">'+
+            '<div class="navlite-head"><span>Координаты</span><small>DMS ⇄ DEC</small></div>'+
+            '<div class="navlite-body">'+
+              '<div class="navlite-field"><label>DMS</label><input id="nl-dms" value="51° 32\' 10&quot; N"></div>'+
+              '<div class="navlite-field"><label>Decimal</label><input id="nl-dec" value="51.536111"></div>'+
+              '<div class="navlite-actions"><button class="navlite-btn primary" id="nl-dms-btn">DMS → DEC</button><button class="navlite-btn" id="nl-dec-btn">DEC → DMS</button></div>'+
+              '<div class="navlite-result" id="nl-coord-result">Готово.</div>'+
+            '</div>'+
+          '</div>'+
+          '<div class="navlite-panel">'+
+            '<div class="navlite-head"><span>METAR вручную</span><small>DECODE</small></div>'+
+            '<div class="navlite-body">'+
+              '<div class="navlite-field"><label>METAR</label><textarea id="nl-metar" placeholder="UWSS 121200Z 24008KT 9999 SCT030 18/10 Q1015"></textarea></div>'+
+              '<button class="navlite-btn primary" id="nl-metar-btn">Разобрать</button>'+
+              '<div class="navlite-result" id="nl-metar-result">Вставь METAR строку.</div>'+
+            '</div>'+
+          '</div>'+
+          '<div class="navlite-panel">'+
+            '<div class="navlite-head"><span>Маршрут AvisCalc</span><small>LOCAL</small></div>'+
+            '<div class="navlite-body">'+
+              '<div class="navlite-row">'+
+                '<div class="navlite-field"><label>Скорость расчёта, км/ч</label><input id="nl-route-speed" type="number" value="180"></div>'+
+              '</div>'+
+              '<div class="navlite-kpi-grid">'+
+                '<div class="navlite-kpi"><span>WP</span><b id="nl-route-wp">0</b></div>'+
+                '<div class="navlite-kpi"><span>Дистанция</span><b id="nl-route-km">—</b></div>'+
+                '<div class="navlite-kpi"><span>ETE</span><b id="nl-route-ete">—</b></div>'+
+              '</div>'+
+              '<button class="navlite-btn primary" id="nl-route-btn">Обновить</button>'+
+              '<div class="navlite-result" id="nl-route-result">Маршрут не загружен.</div>'+
+            '</div>'+
+          '</div>'+
+        '</section>'+
+      '</div>';
+
+    scroll.appendChild(page);
+    bind();
+    routeSummary();
+  }
+
+  function bind(){
+    [
+      ["nl-time-btn",calcTime],
+      ["nl-fuel-btn",calcFuel],
+      ["nl-dms-btn",dmsToDec],
+      ["nl-dec-btn",decToDms],
+      ["nl-metar-btn",parseMetar],
+      ["nl-route-btn",routeSummary]
+    ].forEach(function(pair){
+      var b=el(pair[0]);
+      if(b&&!b.dataset.bound){
+        b.dataset.bound="1";
+        b.addEventListener("click",pair[1]);
+      }
+    });
+  }
+
+  function addNav(){
+    if(document.querySelector('.retro-nav-btn[data-tab="navigator-lite"]'))return;
+    var nav=document.querySelector(".retro-nav");
+    if(!nav)return;
+    var btn=document.createElement("button");
+    btn.className="retro-nav-btn";
+    btn.setAttribute("data-tab","navigator-lite");
+    btn.innerHTML='<span class="ico">✦</span><span><b>Штурман</b><small>Lite</small></span>';
+    btn.addEventListener("click",function(){
+      if(typeof window.showTab==="function")window.showTab("navigator-lite");
+      else{
+        document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active")});
+        var page=el("tab-navigator-lite");if(page)page.classList.add("active");
+      }
+      document.querySelectorAll(".retro-nav-btn").forEach(function(b){
+        b.classList.toggle("active",b.getAttribute("data-tab")==="navigator-lite");
+      });
+      setTimeout(routeSummary,80);
+    });
+    nav.appendChild(btn);
+  }
+
+  function patchShowTab(){
+    if(window.__navigatorLitePatched)return;
+    window.__navigatorLitePatched=true;
+    if(typeof window.showTab==="function"){
+      var old=window.showTab;
+      window.showTab=function(t){
+        ensureTab();
+        var res=old.apply(this,arguments);
+        if(t==="navigator-lite"){
+          document.querySelectorAll(".page").forEach(function(p){
+            p.classList.toggle("active",p.id==="tab-navigator-lite");
+          });
+          document.querySelectorAll(".retro-nav-btn").forEach(function(b){
+            b.classList.toggle("active",b.getAttribute("data-tab")==="navigator-lite");
+          });
+          var sc=document.querySelector(".scroll");if(sc)sc.scrollTop=0;
+          setTimeout(routeSummary,80);
+        }
+        return res;
+      };
+    }
+  }
+
+  function init(){
+    ensureTab();
+    addNav();
+    patchShowTab();
+  }
+
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);
+  else init();
+})();
+// END SAFE ADDON — NAVIGATOR LITE
+
+// SAFE ADDON — ONLINE MAP MODE
+(function(){
+  var state = {
+    leafletLoaded:false,
+    map:null,
+    currentLayer:null,
+    mode:"osm",
+    routeLayer:null,
+    zonesLayer:null,
+    gpsMarker:null,
+    pos:null,
+    route:[],
+    zones:[],
+    objects:[]
+  };
+
+  function el(id){return document.getElementById(id)}
+  function log(msg){
+    var box=el("online-map-log");
+    if(!box)return;
+    box.textContent+="["+new Date().toLocaleTimeString()+"] "+msg+"\n";
+    box.scrollTop=box.scrollHeight;
+  }
+  function setStatus(txt){
+    var x=el("online-map-status");
+    if(x)x.innerHTML=txt;
+  }
+  function safeJson(key,fallback){
+    try{var r=localStorage.getItem(key);return r?JSON.parse(r):fallback}catch(e){return fallback}
+  }
+  function pt(p){
+    if(!p)return null;
+    var lat=Number(p.lat??p.latitude),lon=Number(p.lon??p.lng??p.longitude);
+    if(!isFinite(lat)||!isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180)return null;
+    return{lat:lat,lon:lon,name:p.name||p.title||""};
+  }
+
+  function loadLeaflet(cb){
+    if(window.L){
+      state.leafletLoaded=true;
+      cb(true);
+      return;
+    }
+    if(document.getElementById("leaflet-js-dynamic")){
+      var tries=0;
+      var timer=setInterval(function(){
+        tries++;
+        if(window.L){clearInterval(timer);state.leafletLoaded=true;cb(true)}
+        if(tries>40){clearInterval(timer);cb(false)}
+      },100);
+      return;
+    }
+    var s=document.createElement("script");
+    s.id="leaflet-js-dynamic";
+    s.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    s.integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
+    s.crossOrigin="";
+    s.onload=function(){state.leafletLoaded=!!window.L;cb(state.leafletLoaded)};
+    s.onerror=function(){cb(false)};
+    document.head.appendChild(s);
+  }
+
+  function loadData(){
+    var route=safeJson("aviscalc_imported_route_json",[]);
+    state.route=Array.isArray(route)?route.map(pt).filter(Boolean):[];
+
+    var zones=safeJson("aviscalc_imported_zones_json",[]);
+    state.zones=Array.isArray(zones)?zones.map(function(z){
+      var pts=Array.isArray(z.points)?z.points.map(pt).filter(Boolean):[];
+      return{name:z.name||"ZONE",type:z.type||"",points:pts};
+    }).filter(function(z){return z.points.length>=3}):[];
+
+    var objects=safeJson("aviscalc_imported_objects_json",[]);
+    state.objects=Array.isArray(objects)?objects.map(pt).filter(Boolean):[];
+
+    log("Данные: маршрут "+state.route.length+" WP, зон "+state.zones.length+", объектов "+state.objects.length);
+  }
+
+  function tileLayer(mode){
+    if(!window.L)return null;
+    if(mode==="sat"){
+      return L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+        maxZoom:19,
+        attribution:"Tiles © Esri"
+      });
+    }
+    return L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom:19,
+      attribution:'© OpenStreetMap contributors'
+    });
+  }
+
+  function showFallback(reason){
+    var m=el("online-leaflet-map"), f=el("online-map-fallback");
+    if(m)m.style.display="none";
+    if(f)f.style.display="block";
+    setStatus("<b>Режим:</b> резервная карта · "+(reason||"offline"));
+    drawFallback();
+  }
+
+  function showLeaflet(){
+    var m=el("online-leaflet-map"), f=el("online-map-fallback");
+    if(m)m.style.display="block";
+    if(f)f.style.display="none";
+  }
+
+  function initMap(mode){
+    loadData();
+    if(mode==="reserve"){
+      state.mode="reserve";
+      updateButtons();
+      showFallback("выбран вручную");
+      return;
+    }
+
+    loadLeaflet(function(ok){
+      if(!ok || !window.L){
+        log("Leaflet не загрузился, включаю резерв.");
+        state.mode="reserve";
+        updateButtons();
+        showFallback("Leaflet/CDN недоступен");
+        return;
+      }
+
+      showLeaflet();
+      state.mode=mode||state.mode||"osm";
+      updateButtons();
+
+      var center=[51.592365,45.960804]; // Саратов
+      if(state.pos)center=[state.pos.coords.latitude,state.pos.coords.longitude];
+      else if(state.route.length)center=[state.route[0].lat,state.route[0].lon];
+
+      if(!state.map){
+        state.map=L.map("online-leaflet-map", {
+          zoomControl:true,
+          attributionControl:true
+        }).setView(center, state.route.length?8:7);
+      }
+
+      if(state.currentLayer){
+        try{state.map.removeLayer(state.currentLayer)}catch(e){}
+      }
+      state.currentLayer=tileLayer(state.mode);
+      state.currentLayer.addTo(state.map);
+
+      drawOverlays();
+
+      setTimeout(function(){state.map.invalidateSize()},150);
+      setStatus("<b>Режим:</b> "+(state.mode==="sat"?"спутник Esri":"OSM")+" · маршрут "+state.route.length+" WP · зоны "+state.zones.length);
+      log("Онлайн-карта активна: "+state.mode);
+    });
+  }
+
+  function drawOverlays(){
+    if(!state.map||!window.L)return;
+
+    if(state.routeLayer){try{state.map.removeLayer(state.routeLayer)}catch(e){}}
+    if(state.zonesLayer){try{state.map.removeLayer(state.zonesLayer)}catch(e){}}
+
+    var group=L.featureGroup();
+
+    if(state.route.length>=2){
+      var latlngs=state.route.map(function(p){return[p.lat,p.lon]});
+      var line=L.polyline(latlngs,{color:"#9dff61",weight:3,opacity:.9}).addTo(group);
+      state.route.forEach(function(p,i){
+        L.circleMarker([p.lat,p.lon],{radius:i===0||i===state.route.length-1?6:4,color:"#9dff61",fillColor:"#071016",fillOpacity:.9,weight:2})
+          .bindPopup((i+1)+". "+(p.name||"WP")).addTo(group);
+      });
+    }
+
+    state.zones.forEach(function(z){
+      var latlngs=z.points.map(function(p){return[p.lat,p.lon]});
+      L.polygon(latlngs,{color:"#ffd166",weight:2,fillColor:"#ffd166",fillOpacity:.10})
+        .bindPopup(z.name||"ZONE").addTo(group);
+    });
+
+    state.objects.slice(0,100).forEach(function(p){
+      L.circleMarker([p.lat,p.lon],{radius:3,color:"#58d8ff",fillColor:"#58d8ff",fillOpacity:.8,weight:1})
+        .bindPopup(p.name||"POINT").addTo(group);
+    });
+
+    if(state.pos){
+      var c=state.pos.coords;
+      if(state.gpsMarker){try{state.map.removeLayer(state.gpsMarker)}catch(e){}}
+      state.gpsMarker=L.circleMarker([c.latitude,c.longitude],{radius:8,color:"#58d8ff",fillColor:"#58d8ff",fillOpacity:.9,weight:2})
+        .bindPopup("GPS ±"+Math.round(c.accuracy||0)+" м").addTo(state.map);
+      group.addLayer(state.gpsMarker);
+    }
+
+    state.routeLayer=group.addTo(state.map);
+
+    try{
+      if(group.getLayers().length){
+        state.map.fitBounds(group.getBounds().pad(.18));
+      }
+    }catch(e){}
+  }
+
+  function requestGps(){
+    if(!navigator.geolocation){
+      log("Geolocation API недоступен.");
+      return;
+    }
+    if(location.protocol!=="https:"&&location.hostname!=="localhost"){
+      log("GPS нужен HTTPS.");
+      return;
+    }
+    log("Запрашиваю GPS...");
+    navigator.geolocation.getCurrentPosition(function(pos){
+      state.pos=pos;
+      window.__aviscalcGpsLastPosition=pos;
+      log("GPS OK: "+pos.coords.latitude.toFixed(6)+", "+pos.coords.longitude.toFixed(6)+" ±"+Math.round(pos.coords.accuracy||0)+"м");
+      if(state.mode==="reserve")drawFallback();
+      else{
+        if(state.map)state.map.setView([pos.coords.latitude,pos.coords.longitude],12);
+        drawOverlays();
+      }
+    },function(err){
+      log("GPS ошибка: "+(err.message||err.code));
+    },{enableHighAccuracy:true,timeout:15000,maximumAge:30000});
+  }
+
+  function updateButtons(){
+    document.querySelectorAll(".online-map-btn[data-mode]").forEach(function(b){
+      b.classList.toggle("active",b.dataset.mode===state.mode);
+    });
+  }
+
+  function allPoints(){
+    var pts=[];
+    if(state.pos)pts.push({lat:state.pos.coords.latitude,lon:state.pos.coords.longitude,name:"GPS"});
+    pts=pts.concat(state.route);
+    state.zones.forEach(function(z){pts=pts.concat(z.points)});
+    pts=pts.concat(state.objects);
+    return pts;
+  }
+
+  function drawFallback(){
+    var c=el("online-fallback-canvas");
+    if(!c)return;
+    loadData();
+    var rect=c.getBoundingClientRect(),scale=window.devicePixelRatio||1,w=Math.max(320,Math.floor(rect.width||600)),h=Math.max(300,Math.floor(rect.height||420));
+    c.width=w*scale;c.height=h*scale;
+    var ctx=c.getContext("2d");ctx.setTransform(scale,0,0,scale,0,0);
+    ctx.fillStyle="#03070a";ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle="rgba(88,216,255,.12)";ctx.lineWidth=1;
+    for(var x=0;x<w;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+    for(var y=0;y<h;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+
+    var pts=allPoints();
+    if(!pts.length)pts=[{lat:51.592365,lon:45.960804}];
+    var minLat=90,maxLat=-90,minLon=180,maxLon=-180;
+    pts.forEach(function(p){minLat=Math.min(minLat,p.lat);maxLat=Math.max(maxLat,p.lat);minLon=Math.min(minLon,p.lon);maxLon=Math.max(maxLon,p.lon)});
+    var dLat=Math.max(.01,(maxLat-minLat)*.18),dLon=Math.max(.01,(maxLon-minLon)*.18);
+    minLat-=dLat;maxLat+=dLat;minLon-=dLon;maxLon+=dLon;
+    var pad=28;
+    function px(p){return{x:pad+(p.lon-minLon)/(maxLon-minLon||1)*(w-pad*2),y:h-pad-(p.lat-minLat)/(maxLat-minLat||1)*(h-pad*2)}}
+
+    state.zones.forEach(function(z){
+      ctx.beginPath();
+      z.points.forEach(function(p,i){var q=px(p);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y)});
+      ctx.closePath();
+      ctx.fillStyle="rgba(255,209,102,.08)";
+      ctx.strokeStyle="rgba(255,209,102,.65)";
+      ctx.fill();ctx.stroke();
+    });
+
+    if(state.route.length>=2){
+      ctx.beginPath();
+      state.route.forEach(function(p,i){var q=px(p);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y)});
+      ctx.strokeStyle="rgba(157,255,97,.95)";ctx.lineWidth=2;ctx.stroke();
+    }
+
+    function dot(p,col,r,label){
+      var q=px(p);ctx.beginPath();ctx.arc(q.x,q.y,r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();ctx.strokeStyle="#03070a";ctx.stroke();
+      if(label){ctx.fillStyle=col;ctx.font="10px monospace";ctx.fillText(label,q.x+6,q.y-6)}
+    }
+    state.route.forEach(function(p,i){dot(p,"rgba(157,255,97,.95)",4,i===0?"START":(i===state.route.length-1?"FINISH":""))});
+    state.objects.slice(0,80).forEach(function(p){dot(p,"rgba(88,216,255,.75)",3,"")});
+    if(state.pos)dot({lat:state.pos.coords.latitude,lon:state.pos.coords.longitude},"rgba(88,216,255,.95)",7,"GPS");
+
+    ctx.fillStyle="rgba(3,7,10,.82)";ctx.fillRect(8,8,260,48);
+    ctx.strokeStyle="rgba(88,216,255,.25)";ctx.strokeRect(8,8,260,48);
+    ctx.fillStyle="rgba(184,244,255,.9)";ctx.font="11px monospace";
+    ctx.fillText("RESERVE MAP · no external tiles",16,26);
+    ctx.fillText("route "+state.route.length+" · zones "+state.zones.length,16,44);
+  }
+
+  function ensureMapPage(){
+    var page=el("tab-map") || el("map");
+    if(!page){
+      var scroll=document.querySelector(".scroll");
+      if(!scroll)return null;
+      page=document.createElement("div");
+      page.className="page";
+      page.id="tab-map";
+      scroll.appendChild(page);
+    }
+
+    if(page.querySelector("#online-leaflet-map"))return page;
+
+    page.innerHTML=
+      '<div class="online-map-shell">'+
+        '<div class="online-map-toolbar">'+
+          '<button class="online-map-btn active" data-mode="osm">OSM</button>'+
+          '<button class="online-map-btn" data-mode="sat">Спутник</button>'+
+          '<button class="online-map-btn" data-mode="reserve">Резерв</button>'+
+          '<button class="online-map-btn primary" id="online-map-gps">GPS</button>'+
+        '</div>'+
+        '<div class="online-map-status" id="online-map-status"><b>Режим:</b> подготовка карты...</div>'+
+        '<div id="online-leaflet-map"></div>'+
+        '<div class="online-map-fallback" id="online-map-fallback">'+
+          '<canvas id="online-fallback-canvas"></canvas>'+
+          '<div class="online-map-caption">Резервная карта: маршрут, зоны, GPS и сетка без внешних карт.</div>'+
+        '</div>'+
+        '<div class="online-map-log" id="online-map-log">ONLINE MAP READY\\n</div>'+
+      '</div>';
+
+    page.querySelectorAll(".online-map-btn[data-mode]").forEach(function(b){
+      b.addEventListener("click",function(){
+        initMap(b.dataset.mode);
+      });
+    });
+    var gps=el("online-map-gps");
+    if(gps)gps.addEventListener("click",requestGps);
+
+    return page;
+  }
+
+  function addNavButton(){
+    var existing=document.querySelector('.retro-nav-btn[data-tab="map"]');
+    if(existing)return;
+    var nav=document.querySelector(".retro-nav");
+    if(!nav)return;
+    var btn=document.createElement("button");
+    btn.className="retro-nav-btn";
+    btn.setAttribute("data-tab","map");
+    btn.innerHTML='<span class="ico">⌖</span><span><b>Карта</b><small>Online</small></span>';
+    btn.addEventListener("click",function(){
+      if(typeof window.showTab==="function")window.showTab("map");
+    });
+    nav.appendChild(btn);
+  }
+
+  function patchShowTab(){
+    if(window.__onlineMapModePatched)return;
+    window.__onlineMapModePatched=true;
+    if(typeof window.showTab==="function"){
+      var old=window.showTab;
+      window.showTab=function(t){
+        ensureMapPage();
+        var res=old.apply(this,arguments);
+        if(String(t).toLowerCase()==="map" || String(t).toLowerCase().includes("карта")){
+          document.querySelectorAll(".page").forEach(function(p){
+            p.classList.toggle("active",p.id==="tab-map");
+          });
+          document.querySelectorAll(".retro-nav-btn").forEach(function(b){
+            b.classList.toggle("active",b.getAttribute("data-tab")==="map");
+          });
+          var sc=document.querySelector(".scroll");if(sc)sc.scrollTop=0;
+          setTimeout(function(){initMap(state.mode==="reserve"?"osm":state.mode||"osm")},100);
+        }
+        return res;
+      };
+    }
+  }
+
+  function init(){
+    ensureMapPage();
+    addNavButton();
+    patchShowTab();
+  }
+
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);
+  else init();
+})();
+// END SAFE ADDON — ONLINE MAP MODE
