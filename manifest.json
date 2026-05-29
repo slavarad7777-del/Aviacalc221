@@ -1,0 +1,19 @@
+{
+  "name": "Saratov Oblast offline tiles",
+  "tile_template": "tiles/saratov/{z}/{x}/{y}.png",
+  "center": [
+    51.592365,
+    45.960804
+  ],
+  "bbox": {
+    "south": 49.74,
+    "west": 42.12,
+    "north": 53.0,
+    "east": 51.07
+  },
+  "recommended_zoom": [
+    6,
+    12
+  ],
+  "note": "Put XYZ PNG tiles here: tiles/saratov/z/x/y.png"
+}

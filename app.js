@@ -6094,3 +6094,358 @@ function zonesViewZoom(val) {
   else init();
 })();
 // END SAFE ADDON — MAP LEAFLET FALLBACK
+
+// SAFE ADDON — SARATOV OFFLINE TILES
+(function(){
+  var SARATOV = {
+    name: "Саратовская область",
+    center: {lat: 51.592365, lon: 45.960804},
+    bbox: {minLat: 49.74, maxLat: 53.00, minLon: 42.12, maxLon: 51.07},
+    zoom: 8,
+    minZoom: 6,
+    maxZoom: 12,
+    tileUrl: "tiles/saratov/{z}/{x}/{y}.png"
+  };
+
+  var tileState = {
+    enabled: true,
+    zoom: SARATOV.zoom,
+    center: {lat: SARATOV.center.lat, lon: SARATOV.center.lon},
+    loaded: 0,
+    failed: 0
+  };
+
+  function el(id){ return document.getElementById(id); }
+
+  function lfmLog(msg){
+    var box = el("lfm-log");
+    if(!box) return;
+    box.textContent += "[" + new Date().toLocaleTimeString() + "] " + msg + "\n";
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function setChip(id, v){
+    var x = el(id);
+    if(x) x.textContent = v;
+  }
+
+  function lon2tile(lon,z){ return Math.floor((lon + 180) / 360 * Math.pow(2,z)); }
+  function lat2tile(lat,z){
+    var r = lat * Math.PI / 180;
+    return Math.floor((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * Math.pow(2,z));
+  }
+  function tile2lon(x,z){ return x / Math.pow(2,z) * 360 - 180; }
+  function tile2lat(y,z){
+    var n = Math.PI - 2 * Math.PI * y / Math.pow(2,z);
+    return 180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+  }
+  function project(lat, lon, z){
+    var sin = Math.sin(lat * Math.PI / 180);
+    var scale = 256 * Math.pow(2,z);
+    return {
+      x: (lon + 180) / 360 * scale,
+      y: (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * scale
+    };
+  }
+  function unproject(x, y, z){
+    var scale = 256 * Math.pow(2,z);
+    var lon = x / scale * 360 - 180;
+    var n = Math.PI - 2 * Math.PI * y / scale;
+    var lat = 180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+    return {lat:lat, lon:lon};
+  }
+  function tileUrl(z,x,y){
+    return SARATOV.tileUrl.replace("{z}", z).replace("{x}", x).replace("{y}", y);
+  }
+
+  function normalizePoint(p){
+    if(!p) return null;
+    var lat = Number(p.lat ?? p.latitude);
+    var lon = Number(p.lon ?? p.lng ?? p.longitude);
+    if(!isFinite(lat)||!isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180) return null;
+    return {lat:lat, lon:lon, name:p.name||p.title||""};
+  }
+
+  function getSharedMapState(){
+    var s = {route:[], zones:[], objects:[], pos:null};
+    try{
+      var r = JSON.parse(localStorage.getItem("aviscalc_imported_route_json") || "[]");
+      s.route = Array.isArray(r) ? r.map(normalizePoint).filter(Boolean) : [];
+    }catch(e){}
+    try{
+      var z = JSON.parse(localStorage.getItem("aviscalc_imported_zones_json") || "[]");
+      s.zones = Array.isArray(z) ? z.map(function(a){
+        var pts = Array.isArray(a.points) ? a.points.map(normalizePoint).filter(Boolean) : [];
+        return {name:a.name||"ZONE", points:pts};
+      }).filter(function(a){return a.points.length>=3}) : [];
+    }catch(e){}
+    try{
+      var o = JSON.parse(localStorage.getItem("aviscalc_imported_objects_json") || "[]");
+      s.objects = Array.isArray(o) ? o.map(normalizePoint).filter(Boolean) : [];
+    }catch(e){}
+    if(window.__aviscalcGpsLastPosition){
+      s.pos = window.__aviscalcGpsLastPosition;
+    }
+    return s;
+  }
+
+  // Hook geolocation success globally enough for tile map if user uses old map GPS.
+  var oldGet = navigator.geolocation && navigator.geolocation.getCurrentPosition;
+  if(oldGet && !navigator.geolocation.__aviscalcSaratovPatched){
+    navigator.geolocation.__aviscalcSaratovPatched = true;
+    navigator.geolocation.getCurrentPosition = function(success, error, opts){
+      return oldGet.call(navigator.geolocation, function(pos){
+        window.__aviscalcGpsLastPosition = pos;
+        if(typeof success === "function") success(pos);
+      }, error, opts);
+    };
+  }
+
+  function drawSaratovTileMap(){
+    var c = el("leaflet-fallback-canvas") || el("gps-map-canvas");
+    if(!c) return false;
+
+    var rect = c.getBoundingClientRect();
+    var scale = window.devicePixelRatio || 1;
+    var w = Math.max(320, Math.floor(rect.width || 600));
+    var h = Math.max(300, Math.floor(rect.height || 420));
+    c.width = w * scale;
+    c.height = h * scale;
+
+    var ctx = c.getContext("2d");
+    ctx.setTransform(scale,0,0,scale,0,0);
+    ctx.fillStyle = "#010701";
+    ctx.fillRect(0,0,w,h);
+
+    var z = tileState.zoom;
+    var centerPx = project(tileState.center.lat, tileState.center.lon, z);
+    var topLeft = {x:centerPx.x - w/2, y:centerPx.y - h/2};
+
+    var x0 = Math.floor(topLeft.x / 256);
+    var y0 = Math.floor(topLeft.y / 256);
+    var x1 = Math.floor((topLeft.x + w) / 256);
+    var y1 = Math.floor((topLeft.y + h) / 256);
+
+    tileState.loaded = 0;
+    tileState.failed = 0;
+
+    // grid background while tiles load
+    ctx.strokeStyle="rgba(157,255,97,.12)";
+    ctx.lineWidth=1;
+    for(var gx=0; gx<w; gx+=40){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,h);ctx.stroke();}
+    for(var gy=0; gy<h; gy+=40){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(w,gy);ctx.stroke();}
+
+    function drawOverlays(){
+      var data = getSharedMapState();
+
+      function px(p){
+        var q = project(p.lat, p.lon, z);
+        return {x:q.x - topLeft.x, y:q.y - topLeft.y};
+      }
+
+      // oblast bbox
+      var b1 = px({lat:SARATOV.bbox.minLat, lon:SARATOV.bbox.minLon});
+      var b2 = px({lat:SARATOV.bbox.maxLat, lon:SARATOV.bbox.maxLon});
+      ctx.strokeStyle = "rgba(217,255,95,.65)";
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(Math.min(b1.x,b2.x), Math.min(b1.y,b2.y), Math.abs(b2.x-b1.x), Math.abs(b2.y-b1.y));
+      ctx.fillStyle = "rgba(217,255,95,.8)";
+      ctx.font = "10px monospace";
+      ctx.fillText("САРАТОВСКАЯ ОБЛ.", Math.min(b1.x,b2.x)+6, Math.min(b1.y,b2.y)+14);
+
+      // zones
+      data.zones.forEach(function(zone){
+        ctx.beginPath();
+        zone.points.forEach(function(p,i){
+          var q = px(p);
+          if(i) ctx.lineTo(q.x,q.y); else ctx.moveTo(q.x,q.y);
+        });
+        ctx.closePath();
+        ctx.fillStyle = "rgba(157,255,97,.08)";
+        ctx.strokeStyle = "rgba(157,255,97,.7)";
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+      });
+
+      // route
+      if(data.route.length >= 2){
+        ctx.beginPath();
+        data.route.forEach(function(p,i){
+          var q = px(p);
+          if(i) ctx.lineTo(q.x,q.y); else ctx.moveTo(q.x,q.y);
+        });
+        ctx.strokeStyle = "rgba(157,255,97,.95)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      function dot(p, col, r, label){
+        var q = px(p);
+        ctx.beginPath();
+        ctx.arc(q.x,q.y,r||4,0,Math.PI*2);
+        ctx.fillStyle=col;
+        ctx.fill();
+        ctx.strokeStyle="rgba(1,7,1,.95)";
+        ctx.stroke();
+        if(label){
+          ctx.fillStyle=col;
+          ctx.font="10px monospace";
+          ctx.fillText(label,q.x+6,q.y-6);
+        }
+      }
+
+      data.route.forEach(function(p,i){
+        dot(p,"rgba(157,255,97,.95)",3.5,i===0?"START":(i===data.route.length-1?"FINISH":""));
+      });
+      data.objects.slice(0,80).forEach(function(p){ dot(p,"rgba(217,255,95,.75)",3,""); });
+
+      var city = SARATOV.center;
+      dot(city, "rgba(217,255,95,.95)", 5, "САРАТОВ");
+
+      if(data.pos && data.pos.coords){
+        dot({lat:data.pos.coords.latitude, lon:data.pos.coords.longitude}, "rgba(0,220,255,.95)", 6, "GPS");
+      }
+
+      ctx.fillStyle = "rgba(1,7,1,.78)";
+      ctx.fillRect(8,8,260,48);
+      ctx.strokeStyle = "rgba(157,255,97,.25)";
+      ctx.strokeRect(8,8,260,48);
+      ctx.fillStyle = "rgba(157,255,97,.9)";
+      ctx.font = "11px monospace";
+      ctx.fillText("OFFLINE TILES: tiles/saratov/{z}/{x}/{y}.png", 16, 25);
+      ctx.fillText("Z"+z+" · loaded "+tileState.loaded+" · missing "+tileState.failed, 16, 43);
+
+      var status = el("lfm-status") || el("gps-map-info");
+      if(status) status.textContent = "Саратов · Z" + z + " · tiles " + tileState.loaded + "/" + (tileState.loaded+tileState.failed);
+      updatePanel();
+    }
+
+    var total = 0;
+    for(var tx=x0; tx<=x1; tx++){
+      for(var ty=y0; ty<=y1; ty++){
+        total++;
+        (function(x,y){
+          var img = new Image();
+          img.onload = function(){
+            tileState.loaded++;
+            ctx.drawImage(img, Math.round(x*256 - topLeft.x), Math.round(y*256 - topLeft.y), 256, 256);
+            drawOverlays();
+          };
+          img.onerror = function(){
+            tileState.failed++;
+            // draw tile placeholder
+            var sx = Math.round(x*256 - topLeft.x);
+            var sy = Math.round(y*256 - topLeft.y);
+            ctx.strokeStyle = "rgba(157,255,97,.07)";
+            ctx.strokeRect(sx, sy, 256, 256);
+            ctx.fillStyle = "rgba(157,255,97,.12)";
+            ctx.font = "9px monospace";
+            ctx.fillText("no tile z"+z+"/"+x+"/"+y, sx+8, sy+18);
+            drawOverlays();
+          };
+          img.src = tileUrl(z,x,y);
+        })(tx,ty);
+      }
+    }
+
+    drawOverlays();
+    return true;
+  }
+
+  function updatePanel(){
+    setChip("lfm-saratov-z", "Z" + tileState.zoom);
+    setChip("lfm-saratov-loaded", String(tileState.loaded));
+    setChip("lfm-saratov-missing", String(tileState.failed));
+    setChip("lfm-saratov-center", tileState.center.lat.toFixed(2) + "," + tileState.center.lon.toFixed(2));
+  }
+
+  function injectTilePanel(){
+    var wrap = document.querySelector(".leaflet-fallback-map");
+    if(!wrap || el("lfm-saratov-panel")) return;
+
+    var panel = document.createElement("div");
+    panel.className = "lfm-tile-panel";
+    panel.id = "lfm-saratov-panel";
+    panel.innerHTML =
+      '<div><b>Саратовская область · оффлайн-тайлы</b><br>Положи карту в <code>tiles/saratov/{z}/{x}/{y}.png</code>. Если тайлов нет, останется сетка + GPS/маршрут/зоны.</div>' +
+      '<div class="lfm-tile-status">' +
+        '<div class="lfm-tile-chip"><span>Zoom</span><strong id="lfm-saratov-z">—</strong></div>' +
+        '<div class="lfm-tile-chip"><span>Loaded</span><strong id="lfm-saratov-loaded">0</strong></div>' +
+        '<div class="lfm-tile-chip"><span>Missing</span><strong id="lfm-saratov-missing">0</strong></div>' +
+        '<div class="lfm-tile-chip"><span>Center</span><strong id="lfm-saratov-center">—</strong></div>' +
+      '</div>' +
+      '<div class="lfm-tile-mini-actions">' +
+        '<button class="primary" id="lfm-saratov-z-plus">Z +</button>' +
+        '<button id="lfm-saratov-z-minus">Z −</button>' +
+        '<button id="lfm-saratov-home">Саратов</button>' +
+        '<button id="lfm-saratov-redraw">Тайлы</button>' +
+      '</div>';
+
+    var canvasWrap = wrap.querySelector(".lfm-canvas-wrap");
+    if(canvasWrap) wrap.insertBefore(panel, canvasWrap);
+    else wrap.appendChild(panel);
+
+    var plus = el("lfm-saratov-z-plus");
+    var minus = el("lfm-saratov-z-minus");
+    var home = el("lfm-saratov-home");
+    var redraw = el("lfm-saratov-redraw");
+
+    if(plus) plus.onclick = function(){ tileState.zoom = Math.min(SARATOV.maxZoom, tileState.zoom + 1); drawSaratovTileMap(); };
+    if(minus) minus.onclick = function(){ tileState.zoom = Math.max(SARATOV.minZoom, tileState.zoom - 1); drawSaratovTileMap(); };
+    if(home) home.onclick = function(){ tileState.center = {lat:SARATOV.center.lat, lon:SARATOV.center.lon}; tileState.zoom = SARATOV.zoom; drawSaratovTileMap(); };
+    if(redraw) redraw.onclick = function(){ drawSaratovTileMap(); };
+
+    updatePanel();
+  }
+
+  function patchFallbackDraw(){
+    if(window.__saratovTilesPatchInstalled) return;
+    window.__saratovTilesPatchInstalled = true;
+
+    // Redraw Saratov tile layer whenever fallback canvas appears.
+    var timer = setInterval(function(){
+      var canvas = el("leaflet-fallback-canvas");
+      if(canvas){
+        injectTilePanel();
+        drawSaratovTileMap();
+      }
+    }, 1200);
+
+    setTimeout(function(){ clearInterval(timer); }, 30000);
+  }
+
+  function patchShowTab(){
+    if(window.__saratovTilesShowTabPatched) return;
+    window.__saratovTilesShowTabPatched = true;
+
+    if(typeof window.showTab === "function"){
+      var old = window.showTab;
+      window.showTab = function(t){
+        var result = old.apply(this, arguments);
+        setTimeout(function(){
+          if(el("leaflet-fallback-canvas")){
+            injectTilePanel();
+            drawSaratovTileMap();
+          }
+        }, 250);
+        return result;
+      };
+    }
+  }
+
+  function init(){
+    patchFallbackDraw();
+    patchShowTab();
+    setTimeout(function(){
+      if(el("leaflet-fallback-canvas")){
+        injectTilePanel();
+        drawSaratovTileMap();
+      }
+    }, 1000);
+  }
+
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+// END SAFE ADDON — SARATOV OFFLINE TILES

@@ -4327,3 +4327,68 @@ body.retro-true #tab-gps-map .ph{display:none!important}
   #leaflet-fallback-canvas{height:360px}
 }
 /* END SAFE ADDON — MAP LEAFLET FALLBACK */
+
+/* SAFE ADDON — SARATOV OFFLINE TILES */
+.lfm-tile-panel{
+  border:1px solid #22451d;
+  background:#041004;
+  border-radius:4px;
+  padding:9px 10px;
+  color:var(--mu);
+  font-family:var(--mono);
+  font-size:10px;
+  line-height:1.55;
+  display:grid;
+  gap:7px;
+}
+.lfm-tile-panel b{color:var(--ac);text-shadow:0 0 8px var(--lcd-glow)}
+.lfm-tile-status{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:6px;
+}
+.lfm-tile-chip{
+  border:1px solid #22451d;
+  background:#020b02;
+  border-radius:3px;
+  padding:6px 7px;
+}
+.lfm-tile-chip span{
+  display:block;
+  color:var(--mu);
+  font-size:8px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+.lfm-tile-chip strong{
+  display:block;
+  color:var(--ac);
+  font-size:11px;
+  margin-top:3px;
+}
+.lfm-tile-mini-actions{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:6px;
+}
+.lfm-tile-mini-actions button{
+  border:1px solid #28401e;
+  background:linear-gradient(180deg,#172013,#050905);
+  color:var(--tx);
+  border-radius:3px;
+  font-family:var(--mono);
+  text-transform:uppercase;
+  letter-spacing:.8px;
+  padding:7px 8px;
+  cursor:pointer;
+  font-size:9px;
+}
+.lfm-tile-mini-actions button.primary{
+  color:var(--ac);
+  border-color:var(--ac2);
+  background:linear-gradient(180deg,#173a12,#061406);
+}
+@media(max-width:620px){
+  .lfm-tile-status,.lfm-tile-mini-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* END SAFE ADDON — SARATOV OFFLINE TILES */
