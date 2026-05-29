@@ -7299,7 +7299,7 @@ function zonesViewZoom(val) {
         {title:"GPS", tab:"gps-map", icon:"⌁", desc:"Диагностика"},
         {title:"AIP", tab:"aip", icon:"▤", desc:"Сборники"},
         {title:"ДА-42Т", tab:"da42t", icon:"◆", desc:"РЛЭ"},
-        {title:"Главная", tab:"home", icon:"⌂", desc:"Старт"}
+        {title:"Главная", tab:"all-tabs-hub", icon:"⌂", desc:"Все вкладки"}
       ]
     }
   ];
@@ -7470,3 +7470,65 @@ function zonesViewZoom(val) {
   else init();
 })();
 // END SAFE ADDON — ALL TABS HUB V2
+
+// SAFE ADDON — HUB V2 HOME FIX
+(function(){
+  function showHub(){
+    var page = document.getElementById("tab-all-tabs-hub");
+    if(!page) return false;
+
+    document.body.classList.add("hub-v2-home-active");
+
+    document.querySelectorAll(".page").forEach(function(p){
+      p.classList.toggle("active", p.id === "tab-all-tabs-hub");
+    });
+
+    var sc = document.querySelector(".scroll");
+    if(sc) sc.scrollTop = 0;
+
+    return true;
+  }
+
+  function patch(){
+    if(window.__hubV2HomeFixPatched) return;
+    window.__hubV2HomeFixPatched = true;
+
+    if(typeof window.showTab === "function"){
+      var old = window.showTab;
+      window.showTab = function(t){
+        if(t === "home" || t === "start" || t === "main" || t === "all-tabs-hub" || t === "hub-v2"){
+          if(showHub()) return;
+        }
+        return old.apply(this, arguments);
+      };
+    }
+
+    document.addEventListener("click", function(e){
+      var btn = e.target.closest("[data-go]");
+      if(!btn) return;
+
+      var target = btn.getAttribute("data-go");
+      if(target === "home" || target === "start" || target === "main" || target === "all-tabs-hub"){
+        e.preventDefault();
+        e.stopPropagation();
+        showHub();
+      }
+    }, true);
+  }
+
+  function init(){
+    patch();
+
+    // На случай, если пустой home уже открылся — вернуть на хаб.
+    setTimeout(function(){
+      var active = document.querySelector(".page.active");
+      if(active && String(active.id || "").toLowerCase().includes("home") && active.id !== "tab-all-tabs-hub"){
+        showHub();
+      }
+    }, 500);
+  }
+
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+// END SAFE ADDON — HUB V2 HOME FIX
