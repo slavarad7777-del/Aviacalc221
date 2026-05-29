@@ -4743,17 +4743,40 @@ body.flight-mode .design-bottom{grid-template-columns:repeat(3,minmax(0,1fr))}bo
 @media(max-width:620px){.design-quick{grid-template-columns:1fr}.theme-row{grid-template-columns:1fr}}
 /* END SAFE ADDON — DESIGN HUB V2 */
 
-/* SAFE ADDON — HIDE DESIGN NAV ON START SCREENS */
-body.hide-design-bottom .design-bottom{
+/* SAFE ADDON — STRICT INTRO NAV VISIBILITY */
+
+/* На интро/стартовых экранах нижнего меню быть не должно */
+body.intro-screen-active .design-bottom,
+body.boot-screen-active .design-bottom,
+body.cabin-screen-active .design-bottom{
   display:none!important;
 }
 
-body.hide-design-bottom .scroll,
-body.hide-design-bottom main{
+/* Когда нижнее меню скрыто — не оставляем лишний нижний отступ */
+body.intro-screen-active .scroll,
+body.intro-screen-active main,
+body.boot-screen-active .scroll,
+body.boot-screen-active main,
+body.cabin-screen-active .scroll,
+body.cabin-screen-active main{
   padding-bottom:0!important;
 }
 
-body.hide-design-bottom .compact-status{
+/* На этих экранах компактный верхний статус тоже не нужен */
+body.intro-screen-active .compact-status,
+body.boot-screen-active .compact-status,
+body.cabin-screen-active .compact-status{
   display:none!important;
 }
-/* END SAFE ADDON — HIDE DESIGN NAV ON START SCREENS */
+
+/* Страховка: если страница ещё грузится, меню появляется только когда JS разрешил */
+body.design-v2:not(.design-nav-allowed) .design-bottom{
+  display:none!important;
+}
+
+/* Но на рабочих экранах JS добавит design-nav-allowed */
+body.design-v2.design-nav-allowed .design-bottom{
+  display:grid;
+}
+
+/* END SAFE ADDON — STRICT INTRO NAV VISIBILITY */

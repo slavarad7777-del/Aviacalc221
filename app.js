@@ -6431,68 +6431,131 @@ function zonesViewZoom(val) {
 })();
 // END SAFE ADDON — DESIGN HUB V2
 
-// SAFE ADDON — HIDE DESIGN NAV ON START SCREENS
+// SAFE ADDON — STRICT INTRO NAV VISIBILITY
 (function(){
-  function activePage(){
-    return document.querySelector(".page.active") ||
-           document.querySelector(".screen.active") ||
-           document.querySelector("[data-page].active") ||
-           document.querySelector(".active");
+  var cabinEntered = false;
+
+  function textOf(el){
+    return String((el && el.textContent) || "").replace(/\s+/g, " ").toUpperCase();
   }
 
-  function isStartScreen(node){
-    if(!node) return false;
+  function visibleEnough(el){
+    if(!el || el === document.body || el === document.documentElement) return false;
+    var st = window.getComputedStyle(el);
+    if(st.display === "none" || st.visibility === "hidden" || Number(st.opacity) === 0) return false;
+    var r = el.getBoundingClientRect();
+    if(r.width < 40 || r.height < 30) return false;
+    if(r.bottom < 0 || r.top > window.innerHeight) return false;
+    if(r.right < 0 || r.left > window.innerWidth) return false;
+    return true;
+  }
 
-    var id = String(node.id || "").toLowerCase();
-    var cls = String(node.className || "").toLowerCase();
-    var txt = String(node.textContent || "").replace(/\s+/g, " ").toUpperCase();
+  function visibleText(){
+    var out = [];
+    var nodes = Array.from(document.querySelectorAll("section,main,div,article,button,a,h1,h2,h3,p,span"));
+    nodes.forEach(function(n){
+      if(!visibleEnough(n)) return;
+      var t = textOf(n);
+      if(t) out.push(t);
+    });
+    return out.join(" ");
+  }
 
-    // Первый экран загрузки AVIS OS
-    if(txt.includes("AVIS OS")) return true;
-    if(txt.includes("ЗАПУСК TACTICAL INTERFACE")) return true;
-    if(txt.includes("ЭКОСИСТЕМА АКТИВНА")) return true;
+  function isIntroText(t){
+    if(!t) return false;
 
-    // Старый красивый главный экран с входом в кабину
-    if(txt.includes("AVIS РАСЧ") && txt.includes("ВОЙТИ В КАБИНУ")) return true;
-    if(txt.includes("БЕЗ НАВИГАЦИИ") && txt.includes("НЕТ АВИАЦИИ")) return true;
-    if(txt.includes("ШТУРМАНСКИЙ КАЛЬКУЛЯТОР") && txt.includes("ВОЙТИ В КАБИНУ")) return true;
+    // Загрузочный экран
+    if(t.indexOf("AVIS OS") !== -1) return true;
+    if(t.indexOf("ЗАПУСК TACTICAL INTERFACE") !== -1) return true;
+    if(t.indexOf("ЭКОСИСТЕМА АКТИВНА") !== -1) return true;
 
-    // По id/class, если экран называется splash/intro/boot/start
-    if(/splash|intro|boot|start|welcome/.test(id)) return true;
-    if(/splash|intro|boot|start|welcome/.test(cls)) return true;
+    // Красивый стартовый экран
+    if(t.indexOf("AVIS РАСЧ") !== -1 && t.indexOf("ВОЙТИ В КАБИНУ") !== -1) return true;
+    if(t.indexOf("БЕЗ НАВИГАЦИИ") !== -1 && t.indexOf("НЕТ АВИАЦИИ") !== -1) return true;
+    if(t.indexOf("ШТУРМАНСКИЙ КАЛЬКУЛЯТОР") !== -1 && t.indexOf("V4.0") !== -1) return true;
 
     return false;
   }
 
-  function update(){
-    var page = activePage();
+  function isWorkScreen(){
+    var activePage = document.querySelector(".page.active");
+    var id = activePage ? String(activePage.id || "").toLowerCase() : "";
+    var t = textOf(activePage);
 
-    // Иногда стартовый экран не помечен active, но виден в DOM.
-    var shouldHide = isStartScreen(page);
+    // Наши рабочие вкладки
+    if(id.indexOf("tab-home-v2") !== -1) return true;
+    if(id.indexOf("tab-more-v2") !== -1) return true;
+    if(id.indexOf("tab-nav-mode") !== -1) return true;
+    if(id.indexOf("tab-gps-map") !== -1) return true;
+    if(id.indexOf("tab-file-import") !== -1) return true;
+    if(id.indexOf("tab-aircraft") !== -1) return true;
+    if(id.indexOf("tab-map") !== -1) return true;
 
-    if(!shouldHide){
-      var candidates = Array.from(document.querySelectorAll(".page,.screen,section,main > div"));
-      shouldHide = candidates.some(function(n){
-        var style = window.getComputedStyle(n);
-        if(style.display === "none" || style.visibility === "hidden" || Number(style.opacity) === 0) return false;
-        var r = n.getBoundingClientRect();
-        if(r.width < 40 || r.height < 40) return false;
-        return isStartScreen(n);
-      });
+    // Рабочие тексты
+    if(t.indexOf("NAV MODE") !== -1) return true;
+    if(t.indexOf("ИМПОРТ ФАЙЛА") !== -1) return true;
+    if(t.indexOf("СЕГОДНЯ / ПОЛЁТ") !== -1 || t.indexOf("СЕГОДНЯ / ПОЛЕТ") !== -1) return true;
+    if(t.indexOf("MODULES") !== -1 && t.indexOf("ЕЩЁ") !== -1) return true;
+
+    return false;
+  }
+
+  function markCabinEnteredFromClick(e){
+    var n = e.target;
+    while(n && n !== document.body){
+      var t = textOf(n);
+      if(t.indexOf("ВОЙТИ В КАБИНУ") !== -1 || t.indexOf("ENTER") !== -1){
+        cabinEntered = true;
+        try{ sessionStorage.setItem("aviscalc_cabin_entered", "1"); }catch(err){}
+        setTimeout(update, 60);
+        setTimeout(update, 500);
+        return;
+      }
+      n = n.parentElement;
     }
+  }
 
-    document.body.classList.toggle("hide-design-bottom", !!shouldHide);
+  function update(){
+    try{
+      if(sessionStorage.getItem("aviscalc_cabin_entered") === "1") cabinEntered = true;
+    }catch(e){}
+
+    var vt = visibleText();
+    var intro = isIntroText(vt);
+
+    // Если пользователь уже вошёл в кабину и сейчас рабочий экран — меню можно показывать
+    var work = isWorkScreen();
+
+    // Важная логика:
+    // 1) если видим стартовый текст — скрываем;
+    // 2) если рабочий экран — показываем;
+    // 3) если ещё не вошли в кабину — скрываем.
+    var hide = intro || (!cabinEntered && !work);
+
+    document.body.classList.toggle("intro-screen-active", hide);
+    document.body.classList.toggle("cabin-screen-active", intro);
+    document.body.classList.toggle("design-nav-allowed", !hide);
+
+    // Если мы оказались на рабочем экране, считаем что кабина открыта
+    if(work){
+      cabinEntered = true;
+      try{ sessionStorage.setItem("aviscalc_cabin_entered", "1"); }catch(e){}
+      document.body.classList.remove("intro-screen-active", "cabin-screen-active", "boot-screen-active");
+      document.body.classList.add("design-nav-allowed");
+    }
   }
 
   function patchShowTab(){
-    if(window.__hideDesignBottomPatch) return;
-    window.__hideDesignBottomPatch = true;
+    if(window.__strictIntroNavPatch) return;
+    window.__strictIntroNavPatch = true;
 
     if(typeof window.showTab === "function"){
       var old = window.showTab;
       window.showTab = function(){
+        cabinEntered = true;
+        try{ sessionStorage.setItem("aviscalc_cabin_entered", "1"); }catch(e){}
         var result = old.apply(this, arguments);
-        setTimeout(update, 50);
+        setTimeout(update, 40);
         setTimeout(update, 250);
         return result;
       };
@@ -6500,6 +6563,7 @@ function zonesViewZoom(val) {
   }
 
   function init(){
+    document.addEventListener("click", markCabinEnteredFromClick, true);
     patchShowTab();
     update();
 
@@ -6511,17 +6575,20 @@ function zonesViewZoom(val) {
       childList:true,
       subtree:true,
       attributes:true,
-      attributeFilter:["class","style"]
+      attributeFilter:["class","style","hidden"]
     });
 
     window.addEventListener("load", function(){
-      setTimeout(update, 100);
-      setTimeout(update, 800);
-      setTimeout(update, 1800);
+      setTimeout(update, 80);
+      setTimeout(update, 500);
+      setTimeout(update, 1500);
+      setTimeout(update, 3000);
     });
+
+    setInterval(update, 1000);
   }
 
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
 })();
-// END SAFE ADDON — HIDE DESIGN NAV ON START SCREENS
+// END SAFE ADDON — STRICT INTRO NAV VISIBILITY
