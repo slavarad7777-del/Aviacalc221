@@ -5361,3 +5361,197 @@ body.ui-polish-v1 .note,body.ui-polish-v1 .gps-note,body.ui-polish-v1 .nav-note,
 @media(max-width:760px){body.ui-polish-v1 .nav-primary-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}body.ui-polish-v1 .nav-mini-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}body.ui-polish-v1 .nav-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
 @media(max-width:620px){body.ui-polish-v1 .page{padding:8px!important}body.ui-polish-v1 .nav-title,body.ui-polish-v1 .gps-title,body.ui-polish-v1 .fi-title,body.ui-polish-v1 .navlite-title{font-size:20px!important}body.ui-polish-v1 #online-leaflet-map{height:430px!important;min-height:350px!important}body.ui-polish-v1 .online-map-fallback,body.ui-polish-v1 #online-fallback-canvas{height:350px!important;min-height:350px!important}body.ui-polish-v1 .nav-map-wrap,body.ui-polish-v1 #nav-mode-canvas{height:300px!important;min-height:300px!important}body.ui-polish-v1 .navlite-grid{gap:8px!important}}
 /* END SAFE ADDON — UI COMPACT POLISH V1 */
+
+/* SAFE ADDON — ALL TABS HUB */
+body.retro-true #tab-all-tabs-hub .ph{display:none!important}
+
+.alltabs-app{
+  display:grid;
+  gap:12px;
+}
+
+.alltabs-hero{
+  border:1px solid rgba(88,216,255,.22);
+  border-radius:12px;
+  padding:14px;
+  background:
+    radial-gradient(circle at 82% 18%,rgba(88,216,255,.12),transparent 34%),
+    linear-gradient(180deg,rgba(13,24,31,.94),rgba(6,10,14,.98));
+  box-shadow:0 10px 26px rgba(0,0,0,.24), inset 0 0 22px rgba(88,216,255,.04);
+}
+
+.alltabs-kicker{
+  color:var(--mu,#76929b);
+  font-size:8px;
+  letter-spacing:1.8px;
+  text-transform:uppercase;
+  margin-bottom:7px;
+}
+
+.alltabs-title{
+  color:var(--ac,#58d8ff);
+  font-size:24px;
+  line-height:1;
+  letter-spacing:2.4px;
+  text-transform:uppercase;
+  text-shadow:0 0 14px rgba(88,216,255,.34);
+}
+
+.alltabs-sub{
+  color:var(--tx,#d8f7ff);
+  opacity:.82;
+  font-size:10px;
+  line-height:1.45;
+  margin-top:8px;
+}
+
+.alltabs-status{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+}
+
+.alltabs-chip{
+  border:1px solid rgba(88,216,255,.16);
+  background:rgba(5,10,14,.92);
+  border-radius:9px;
+  padding:8px;
+}
+
+.alltabs-chip span{
+  display:block;
+  color:var(--mu,#76929b);
+  font-size:7px;
+  letter-spacing:.9px;
+  text-transform:uppercase;
+}
+
+.alltabs-chip b{
+  display:block;
+  color:#b8f4ff;
+  font-size:14px;
+  margin-top:4px;
+  text-shadow:0 0 8px rgba(88,216,255,.25);
+}
+
+.alltabs-section-title{
+  color:var(--mu,#76929b);
+  font-size:9px;
+  letter-spacing:1.8px;
+  text-transform:uppercase;
+  margin:2px 0 -4px;
+}
+
+.alltabs-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+}
+
+.alltabs-tile{
+  border:1px solid rgba(88,216,255,.18);
+  background:
+    radial-gradient(circle at 82% 20%,rgba(88,216,255,.08),transparent 34%),
+    linear-gradient(180deg,rgba(12,20,26,.94),rgba(6,10,14,.98));
+  color:var(--tx,#d8f7ff);
+  border-radius:12px;
+  padding:11px;
+  min-height:92px;
+  cursor:pointer;
+  font-family:var(--mono,monospace);
+  text-align:left;
+  display:grid;
+  align-content:space-between;
+  box-shadow:0 8px 22px rgba(0,0,0,.20), inset 0 0 16px rgba(88,216,255,.03);
+}
+
+.alltabs-tile.primary{
+  border-color:rgba(120,255,160,.32);
+  background:
+    radial-gradient(circle at 82% 20%,rgba(120,255,160,.10),transparent 34%),
+    linear-gradient(180deg,rgba(12,28,18,.94),rgba(6,10,14,.98));
+}
+
+.alltabs-tile .ico{
+  color:#58d8ff;
+  font-size:22px;
+  line-height:1;
+  text-shadow:0 0 10px rgba(88,216,255,.35);
+}
+
+.alltabs-tile.primary .ico{
+  color:#9dffb0;
+  text-shadow:0 0 10px rgba(157,255,176,.35);
+}
+
+.alltabs-tile b{
+  display:block;
+  color:var(--tx,#d8f7ff);
+  font-size:12px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-top:8px;
+}
+
+.alltabs-tile small{
+  display:block;
+  color:var(--mu,#76929b);
+  font-size:8px;
+  line-height:1.35;
+  margin-top:4px;
+}
+
+.alltabs-actions{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+
+.alltabs-btn{
+  border:1px solid rgba(88,216,255,.22);
+  background:linear-gradient(180deg,#122029,#081016);
+  color:var(--tx,#d8f7ff);
+  border-radius:10px;
+  padding:9px 8px;
+  font-family:var(--mono,monospace);
+  text-transform:uppercase;
+  letter-spacing:.8px;
+  font-size:9px;
+  cursor:pointer;
+}
+
+.alltabs-btn.primary{
+  border-color:rgba(120,255,160,.34);
+  background:linear-gradient(180deg,#12301f,#08160d);
+  color:#9dffb0;
+}
+
+@media(max-width:760px){
+  .alltabs-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .alltabs-status{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media(max-width:420px){
+  .alltabs-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+  .alltabs-tile{
+    min-height:82px;
+    padding:10px;
+  }
+  .alltabs-tile .ico{
+    font-size:19px;
+  }
+  .alltabs-tile b{
+    font-size:10px;
+  }
+  .alltabs-actions{
+    grid-template-columns:1fr;
+  }
+}
+/* END SAFE ADDON — ALL TABS HUB */

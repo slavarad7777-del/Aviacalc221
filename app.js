@@ -7080,3 +7080,188 @@ function zonesViewZoom(val) {
   else init();
 })();
 // END SAFE ADDON — UI COMPACT POLISH V1
+
+// SAFE ADDON — ALL TABS HUB
+(function(){
+  function el(id){return document.getElementById(id)}
+  function safeJson(k,f){try{var r=localStorage.getItem(k);return r?JSON.parse(r):f}catch(e){return f}}
+
+  var modules = [
+    {title:"NAV", tab:"nav-mode", icon:"◉", desc:"Полётный планшет", primary:true},
+    {title:"Карта", tab:"map", icon:"⌖", desc:"OSM / спутник / резерв", primary:true},
+    {title:"Штурман", tab:"navigator-lite", icon:"✦", desc:"Расчёты и METAR", primary:true},
+    {title:"Самолёты", tab:"aircraft", icon:"✈", desc:"Профили и ДА-42Т", primary:true},
+
+    {title:"Чек-листы", tab:"checklists", icon:"☑", desc:"Процедуры"},
+    {title:"Файл", tab:"file-import", icon:"⇪", desc:"KML / GPX / GeoJSON"},
+    {title:"Маршрут", tab:"route", icon:"↗", desc:"Точки и расчёты"},
+    {title:"Зоны", tab:"zones", icon:"⬡", desc:"Полигоны и контроль"},
+    {title:"GPS", tab:"gps-map", icon:"⌁", desc:"Диагностика"},
+    {title:"AIP", tab:"aip", icon:"▤", desc:"Сборники / данные"},
+    {title:"ДА-42Т", tab:"da42t", icon:"◆", desc:"Карточка РЛЭ"},
+    {title:"Главная", tab:"home", icon:"⌂", desc:"Стартовый экран"}
+  ];
+
+  function status(){
+    var route=safeJson("aviscalc_imported_route_json",[]);
+    var r=Array.isArray(route)?route.length:0;
+
+    var zones=safeJson("aviscalc_imported_zones_json",[]);
+    var z=Array.isArray(zones)?zones.length:0;
+
+    var gps="—";
+    if(window.__aviscalcGpsLastPosition&&window.__aviscalcGpsLastPosition.coords){
+      gps="OK";
+    }
+
+    var nav=(el("nav-status")&&el("nav-status").textContent)||"STBY";
+
+    var map={
+      "alltabs-route":r+" WP",
+      "alltabs-zones":z,
+      "alltabs-gps":gps,
+      "alltabs-nav":nav
+    };
+
+    Object.keys(map).forEach(function(k){
+      var x=el(k);
+      if(x)x.textContent=map[k];
+    });
+  }
+
+  function go(tab){
+    if(typeof window.showTab==="function"){
+      try{
+        window.showTab(tab);
+        return;
+      }catch(e){}
+    }
+
+    document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active")});
+    var page=el("tab-"+tab)||el(tab);
+    if(page)page.classList.add("active");
+
+    document.querySelectorAll(".retro-nav-btn").forEach(function(b){
+      b.classList.toggle("active",b.getAttribute("data-tab")===tab);
+    });
+  }
+
+  function ensureTab(){
+    if(el("tab-all-tabs-hub"))return;
+    var scroll=document.querySelector(".scroll");
+    if(!scroll)return;
+
+    var page=document.createElement("div");
+    page.className="page";
+    page.id="tab-all-tabs-hub";
+
+    var primary=modules.filter(function(m){return m.primary});
+    var other=modules.filter(function(m){return !m.primary});
+
+    function tile(m){
+      return '<button class="alltabs-tile '+(m.primary?'primary':'')+'" data-go="'+m.tab+'">'+
+        '<div><div class="ico">'+m.icon+'</div><b>'+m.title+'</b><small>'+m.desc+'</small></div>'+
+      '</button>';
+    }
+
+    page.innerHTML=
+      '<div class="alltabs-app">'+
+        '<section class="alltabs-hero">'+
+          '<div class="alltabs-kicker">AVISCALC · MODULE HUB</div>'+
+          '<div class="alltabs-title">Все вкладки</div>'+
+          '<div class="alltabs-sub">Единый экран для перехода во все разделы. Дальше будем оптимизировать именно его.</div>'+
+        '</section>'+
+        '<section class="alltabs-status">'+
+          '<div class="alltabs-chip"><span>Маршрут</span><b id="alltabs-route">0 WP</b></div>'+
+          '<div class="alltabs-chip"><span>Зоны</span><b id="alltabs-zones">0</b></div>'+
+          '<div class="alltabs-chip"><span>GPS</span><b id="alltabs-gps">—</b></div>'+
+          '<div class="alltabs-chip"><span>NAV</span><b id="alltabs-nav">STBY</b></div>'+
+        '</section>'+
+        '<div class="alltabs-section-title">Основные</div>'+
+        '<section class="alltabs-grid">'+primary.map(tile).join("")+'</section>'+
+        '<div class="alltabs-section-title">Дополнительно</div>'+
+        '<section class="alltabs-grid">'+other.map(tile).join("")+'</section>'+
+        '<section class="alltabs-actions">'+
+          '<button class="alltabs-btn primary" id="alltabs-refresh">Обновить статус</button>'+
+          '<button class="alltabs-btn" id="alltabs-compact">Compact</button>'+
+          '<button class="alltabs-btn" id="alltabs-map">Карта</button>'+
+        '</section>'+
+      '</div>';
+
+    scroll.appendChild(page);
+
+    page.querySelectorAll("[data-go]").forEach(function(b){
+      b.addEventListener("click",function(){go(b.dataset.go)});
+    });
+
+    var refresh=el("alltabs-refresh");
+    if(refresh)refresh.addEventListener("click",status);
+
+    var compact=el("alltabs-compact");
+    if(compact)compact.addEventListener("click",function(){
+      var c=el("compact-toggle");
+      if(c)c.click();
+      else document.body.classList.toggle("compact-mode");
+    });
+
+    var map=el("alltabs-map");
+    if(map)map.addEventListener("click",function(){go("map")});
+
+    status();
+  }
+
+  function addNavButton(){
+    if(document.querySelector('.retro-nav-btn[data-tab="all-tabs-hub"]'))return;
+    var nav=document.querySelector(".retro-nav");
+    if(!nav)return;
+
+    var btn=document.createElement("button");
+    btn.className="retro-nav-btn";
+    btn.setAttribute("data-tab","all-tabs-hub");
+    btn.innerHTML='<span class="ico">▦</span><span><b>Все</b><small>Вкладки</small></span>';
+    btn.addEventListener("click",function(){
+      if(typeof window.showTab==="function")window.showTab("all-tabs-hub");
+      else go("all-tabs-hub");
+    });
+
+    nav.insertBefore(btn,nav.firstChild);
+  }
+
+  function patchShowTab(){
+    if(window.__allTabsHubPatched)return;
+    window.__allTabsHubPatched=true;
+
+    if(typeof window.showTab==="function"){
+      var old=window.showTab;
+      window.showTab=function(t){
+        ensureTab();
+        var result=old.apply(this,arguments);
+        if(t==="all-tabs-hub"){
+          document.querySelectorAll(".page").forEach(function(p){
+            p.classList.toggle("active",p.id==="tab-all-tabs-hub");
+          });
+          document.querySelectorAll(".retro-nav-btn").forEach(function(b){
+            b.classList.toggle("active",b.getAttribute("data-tab")==="all-tabs-hub");
+          });
+          var sc=document.querySelector(".scroll");
+          if(sc)sc.scrollTop=0;
+          setTimeout(status,80);
+        }
+        return result;
+      };
+    }
+  }
+
+  function init(){
+    ensureTab();
+    addNavButton();
+    patchShowTab();
+
+    // Не делаем этот экран стартовым автоматически, чтобы не ломать текущий запуск.
+    setInterval(status,12000);
+  }
+
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);
+  else init();
+})();
+// END SAFE ADDON — ALL TABS HUB
