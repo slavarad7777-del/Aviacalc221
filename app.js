@@ -6500,3 +6500,147 @@ function zonesViewZoom(val) {
     }
   }, 10000);
 })();
+
+// SAFE ADDON — START SCREEN BOTTOM NAV FIX
+(function(){
+  var entered = false;
+
+  function cleanText(s){
+    return String(s || "").replace(/\s+/g, " ").trim().toUpperCase();
+  }
+
+  function visibleEnough(el){
+    if(!el || el === document.body || el === document.documentElement) return false;
+    var st = window.getComputedStyle(el);
+    if(st.display === "none" || st.visibility === "hidden" || Number(st.opacity) === 0) return false;
+    var r = el.getBoundingClientRect();
+    if(r.width < 80 || r.height < 60) return false;
+    if(r.bottom < 0 || r.top > window.innerHeight) return false;
+    return true;
+  }
+
+  function hasStartScreen(){
+    var nodes = Array.from(document.querySelectorAll("section, main, .page, .screen, div"));
+    for(var i=0;i<nodes.length;i++){
+      var n = nodes[i];
+      if(!visibleEnough(n)) continue;
+      var t = cleanText(n.textContent);
+
+      // Старый красивый главный экран из скрина
+      var isOldHome =
+        t.indexOf("AVIS РАСЧ") !== -1 &&
+        (
+          t.indexOf("СУ-25") !== -1 ||
+          t.indexOf("ЯК-130") !== -1 ||
+          t.indexOf("ДА-42Т") !== -1 ||
+          t.indexOf("ВОЙТИ В КАБИНУ") !== -1 ||
+          t.indexOf("БЕЗ НАВИГАЦИИ") !== -1
+        );
+
+      // Загрузочный экран
+      var isBoot =
+        t.indexOf("AVIS OS") !== -1 ||
+        t.indexOf("ЗАПУСК TACTICAL INTERFACE") !== -1;
+
+      if(isOldHome || isBoot) return true;
+    }
+    return false;
+  }
+
+  function isWorkingPage(){
+    var active = document.querySelector(".page.active");
+    if(!active) return false;
+    var id = String(active.id || "").toLowerCase();
+    var t = cleanText(active.textContent);
+
+    if(id.indexOf("home-v2") !== -1) return true;
+    if(id.indexOf("more-v2") !== -1) return true;
+    if(id.indexOf("nav-mode") !== -1) return true;
+    if(id.indexOf("gps-map") !== -1) return true;
+    if(id.indexOf("file-import") !== -1) return true;
+    if(id.indexOf("tab-map") !== -1) return true;
+
+    if(t.indexOf("NAV MODE") !== -1) return true;
+    if(t.indexOf("СЕГОДНЯ / ПОЛЁТ") !== -1 || t.indexOf("СЕГОДНЯ / ПОЛЕТ") !== -1) return true;
+    if(t.indexOf("ИМПОРТ ФАЙЛА") !== -1) return true;
+    if(t.indexOf("MODULES") !== -1 && t.indexOf("ЕЩЁ") !== -1) return true;
+
+    return false;
+  }
+
+  function update(){
+    var work = isWorkingPage();
+    if(work) entered = true;
+
+    var start = hasStartScreen();
+
+    // Скрываем только если видим стартовый экран и ещё не перешли в рабочий режим.
+    // Если старый экран всё ещё находится в DOM на фоне, но активна рабочая вкладка — не скрываем.
+    document.body.classList.toggle("start-screen-no-bottom", start && !work);
+  }
+
+  function onClick(e){
+    var n = e.target;
+    while(n && n !== document.body){
+      var t = cleanText(n.textContent);
+      if(
+        t.indexOf("ВОЙТИ В КАБИНУ") !== -1 ||
+        t.indexOf("NAV") !== -1 ||
+        t.indexOf("КАРТА") !== -1 ||
+        t.indexOf("ЕЩЁ") !== -1 ||
+        t.indexOf("ГЛАВНАЯ") !== -1
+      ){
+        entered = true;
+        setTimeout(update, 60);
+        setTimeout(update, 250);
+        return;
+      }
+      n = n.parentElement;
+    }
+  }
+
+  function patchShowTab(){
+    if(window.__startScreenBottomNavFix) return;
+    window.__startScreenBottomNavFix = true;
+
+    if(typeof window.showTab === "function"){
+      var old = window.showTab;
+      window.showTab = function(){
+        entered = true;
+        var result = old.apply(this, arguments);
+        setTimeout(update, 60);
+        setTimeout(update, 250);
+        return result;
+      };
+    }
+  }
+
+  function init(){
+    document.addEventListener("click", onClick, true);
+    patchShowTab();
+    update();
+
+    var obs = new MutationObserver(function(){
+      update();
+    });
+
+    obs.observe(document.body, {
+      childList:true,
+      subtree:true,
+      attributes:true,
+      attributeFilter:["class","style"]
+    });
+
+    window.addEventListener("load", function(){
+      setTimeout(update, 100);
+      setTimeout(update, 700);
+      setTimeout(update, 1600);
+    });
+
+    setInterval(update, 1200);
+  }
+
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+// END SAFE ADDON — START SCREEN BOTTOM NAV FIX
