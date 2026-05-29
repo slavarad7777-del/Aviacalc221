@@ -5047,3 +5047,62 @@ body.clean-efb-v3 .compact-toggle{
   .clean-mission-card b{font-size:17px}
 }
 /* END SAFE ADDON — DESIGN V3 CLEAN EFB */
+
+/* SAFE ADDON — DESIGN V3 LAYER FIX */
+
+/* Когда открыта Clean-главная, прячем все старые экраны внутри scroll */
+body.clean-home-active .scroll > *:not(#tab-clean-home){
+  display:none!important;
+}
+
+/* На Clean-главной старый Design v2 экран тоже не должен просвечивать */
+body.clean-home-active #tab-home-v2,
+body.clean-home-active #tab-more-v2,
+body.clean-home-active .design-home:not(#tab-clean-home .design-home){
+  display:none!important;
+}
+
+/* Clean-главная становится нормальным экраном, не наложением */
+body.clean-home-active #tab-clean-home{
+  display:grid!important;
+  position:relative!important;
+  z-index:5!important;
+  width:100%!important;
+  min-height:100vh!important;
+  box-sizing:border-box!important;
+}
+
+/* Убираем верхние старые панели только на clean-главной */
+body.clean-home-active .lcd-panel,
+body.clean-home-active .top-panel,
+body.clean-home-active .header-panel,
+body.clean-home-active .status-panel{
+  display:none!important;
+}
+
+/* Но если пользователь ушёл с главной — всё возвращается */
+body:not(.clean-home-active) #tab-clean-home{
+  display:none!important;
+}
+
+/* Чтобы верхняя строка не закрывала рабочий контент */
+body.clean-efb-v3 .scroll{
+  padding-top:58px!important;
+}
+
+/* Clean Home сама уже имеет отступ, поэтому двойной не нужен */
+body.clean-home-active #tab-clean-home.clean-home{
+  padding-top:58px!important;
+}
+
+/* Полностью отключаем старую нижнюю плашку Design v2 */
+body.clean-efb-v3 .design-bottom{
+  display:none!important;
+}
+
+/* Старый экран Сегодня/Полёт от Design v2 не нужен в V3 */
+body.clean-efb-v3 #tab-home-v2{
+  display:none!important;
+}
+
+/* END SAFE ADDON — DESIGN V3 LAYER FIX */

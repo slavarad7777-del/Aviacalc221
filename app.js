@@ -6725,3 +6725,130 @@ function zonesViewZoom(val) {
   else init();
 })();
 // END SAFE ADDON — DESIGN V3 CLEAN EFB
+
+// SAFE ADDON — DESIGN V3 LAYER FIX
+(function(){
+  function el(id){ return document.getElementById(id); }
+
+  function activateCleanHome(){
+    var home = el("tab-clean-home");
+    if(!home) return;
+
+    document.body.classList.add("clean-home-active");
+
+    // Снимаем active со всех старых page, кроме Clean Home
+    document.querySelectorAll(".page").forEach(function(p){
+      p.classList.toggle("active", p.id === "tab-clean-home");
+    });
+
+    home.classList.add("active");
+
+    var sc = document.querySelector(".scroll");
+    if(sc) sc.scrollTop = 0;
+  }
+
+  function leaveCleanHome(){
+    document.body.classList.remove("clean-home-active");
+    var home = el("tab-clean-home");
+    if(home) home.classList.remove("active");
+  }
+
+  function patchCleanButtons(){
+    var home = el("tab-clean-home");
+    if(!home || home.dataset.layerFixBound) return;
+    home.dataset.layerFixBound = "1";
+
+    home.addEventListener("click", function(e){
+      var btn = e.target.closest("[data-go]");
+      if(!btn) return;
+
+      var target = btn.getAttribute("data-go");
+      if(!target || target === "home" || target === "clean-home") return;
+
+      leaveCleanHome();
+    }, true);
+  }
+
+  function patchShowTab(){
+    if(window.__designV3LayerFixPatched) return;
+    window.__designV3LayerFixPatched = true;
+
+    if(typeof window.showTab === "function"){
+      var old = window.showTab;
+      window.showTab = function(t){
+        if(t === "clean-home" || t === "home-v3"){
+          activateCleanHome();
+          return;
+        }
+
+        // Любой рабочий переход должен убрать Clean Home
+        leaveCleanHome();
+
+        var result = old.apply(this, arguments);
+
+        setTimeout(function(){
+          if(t === "clean-home" || t === "home-v3") activateCleanHome();
+        }, 80);
+
+        return result;
+      };
+    }
+  }
+
+  function patchHomeButton(){
+    var btn = el("clean-home-btn");
+    if(btn && !btn.dataset.layerFixBound){
+      btn.dataset.layerFixBound = "1";
+      btn.addEventListener("click", function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        activateCleanHome();
+      }, true);
+    }
+  }
+
+  function disableDesignV2AutoHome(){
+    // Если старый Design v2 экран активировался, сразу выключаем его на Clean V3.
+    var h2 = el("tab-home-v2");
+    if(h2) h2.classList.remove("active");
+  }
+
+  function init(){
+    patchShowTab();
+    patchHomeButton();
+    patchCleanButtons();
+    disableDesignV2AutoHome();
+
+    // После загрузки показываем Clean Home как единственный главный экран
+    setTimeout(function(){
+      patchHomeButton();
+      patchCleanButtons();
+      activateCleanHome();
+    }, 900);
+
+    setTimeout(function(){
+      patchHomeButton();
+      patchCleanButtons();
+      activateCleanHome();
+    }, 2500);
+
+    var obs = new MutationObserver(function(){
+      patchHomeButton();
+      patchCleanButtons();
+      if(document.body.classList.contains("clean-home-active")){
+        disableDesignV2AutoHome();
+      }
+    });
+
+    obs.observe(document.body, {
+      childList:true,
+      subtree:true,
+      attributes:true,
+      attributeFilter:["class","style"]
+    });
+  }
+
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+// END SAFE ADDON — DESIGN V3 LAYER FIX
