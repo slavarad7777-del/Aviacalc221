@@ -4232,3 +4232,98 @@ body.retro-true #tab-gps-map .ph{display:none!important}
 @media(max-width:980px){.gps-grid{grid-template-columns:1fr}}
 @media(max-width:620px){.gps-title{font-size:24px;letter-spacing:3px}.gps-kpi-grid,.gps-actions{grid-template-columns:1fr}.gps-map-wrap{min-height:360px}#gps-map-canvas{height:360px}}
 /* END SAFE ADDON — GPS MAP DIAGNOSTIC */
+
+/* SAFE ADDON — MAP LEAFLET FALLBACK */
+.leaflet-fallback-map{
+  display:grid;
+  gap:10px;
+  padding:10px;
+}
+.leaflet-fallback-map .lfm-head{
+  border:1px solid #22451d;
+  background:#041004;
+  border-radius:4px;
+  padding:10px 11px;
+  color:var(--mu);
+  font-family:var(--mono);
+  font-size:10px;
+  line-height:1.55;
+}
+.leaflet-fallback-map .lfm-head b{
+  color:var(--ac);
+  text-shadow:0 0 8px var(--lcd-glow);
+}
+.leaflet-fallback-map .lfm-actions{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.leaflet-fallback-map .lfm-btn{
+  border:1px solid #28401e;
+  background:linear-gradient(180deg,#172013,#050905);
+  color:var(--tx);
+  border-radius:3px;
+  font-family:var(--mono);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  padding:9px 10px;
+  cursor:pointer;
+  font-size:10px;
+}
+.leaflet-fallback-map .lfm-btn.primary{
+  color:var(--ac);
+  background:linear-gradient(180deg,#173a12,#061406);
+  border-color:var(--ac2);
+}
+.leaflet-fallback-map .lfm-canvas-wrap{
+  position:relative;
+  border:1px solid #22451d;
+  background:#010701;
+  border-radius:4px;
+  overflow:hidden;
+  min-height:420px;
+}
+#leaflet-fallback-canvas{
+  display:block;
+  width:100%;
+  height:420px;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(157,255,97,.045),transparent 45%),
+    repeating-linear-gradient(to bottom,rgba(157,255,97,.035) 0 1px,transparent 1px 12px),
+    repeating-linear-gradient(to right,rgba(157,255,97,.03) 0 1px,transparent 1px 12px),
+    #010701;
+}
+.leaflet-fallback-map .lfm-caption{
+  position:absolute;
+  left:8px;
+  right:8px;
+  bottom:8px;
+  border:1px solid rgba(157,255,97,.18);
+  background:rgba(1,7,1,.84);
+  color:var(--mu);
+  font-size:9px;
+  line-height:1.4;
+  padding:7px 8px;
+  font-family:var(--mono);
+  pointer-events:none;
+}
+.leaflet-fallback-map .lfm-log{
+  min-height:72px;
+  max-height:140px;
+  overflow:auto;
+  border:1px solid #22451d;
+  background:#010701;
+  color:var(--mu);
+  border-radius:3px;
+  padding:9px;
+  font-family:var(--mono);
+  font-size:10px;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+@media(max-width:620px){
+  .leaflet-fallback-map .lfm-actions{grid-template-columns:1fr}
+  .leaflet-fallback-map .lfm-canvas-wrap{min-height:360px}
+  #leaflet-fallback-canvas{height:360px}
+}
+/* END SAFE ADDON — MAP LEAFLET FALLBACK */

@@ -5841,3 +5841,256 @@ function zonesViewZoom(val) {
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
 // END SAFE ADDON — GPS MAP DIAGNOSTIC
+
+// SAFE ADDON — MAP LEAFLET FALLBACK
+(function(){
+  var state = {pos:null, route:[], zones:[], objects:[]};
+
+  function el(id){ return document.getElementById(id); }
+  function log(msg){
+    var box = el("lfm-log");
+    if(!box) return;
+    box.textContent += "[" + new Date().toLocaleTimeString() + "] " + msg + "\n";
+    box.scrollTop = box.scrollHeight;
+  }
+  function safeJson(key, fallback){
+    try{
+      var raw = localStorage.getItem(key);
+      return raw ? (JSON.parse(raw) || fallback) : fallback;
+    }catch(e){ return fallback; }
+  }
+  function pt(p){
+    if(!p) return null;
+    var lat = Number(p.lat ?? p.latitude);
+    var lon = Number(p.lon ?? p.lng ?? p.longitude);
+    if(!isFinite(lat) || !isFinite(lon) || Math.abs(lat)>90 || Math.abs(lon)>180) return null;
+    return {lat:lat, lon:lon, name:p.name || p.title || ""};
+  }
+  function loadData(){
+    var r = safeJson("aviscalc_imported_route_json", []);
+    state.route = Array.isArray(r) ? r.map(pt).filter(Boolean) : [];
+
+    var z = safeJson("aviscalc_imported_zones_json", []);
+    state.zones = Array.isArray(z) ? z.map(function(x){
+      var pts = Array.isArray(x.points) ? x.points.map(pt).filter(Boolean) : [];
+      return {name:x.name || "ZONE", points:pts};
+    }).filter(function(x){ return x.points.length >= 3; }) : [];
+
+    var o = safeJson("aviscalc_imported_objects_json", []);
+    state.objects = Array.isArray(o) ? o.map(pt).filter(Boolean) : [];
+
+    log("Данные: маршрут " + state.route.length + " т., зон " + state.zones.length + ", объектов " + state.objects.length);
+    draw();
+  }
+  function bounds(points){
+    if(!points.length) return {minLat:55.4,maxLat:56.1,minLon:37.1,maxLon:38.1};
+    var minLat=90,maxLat=-90,minLon=180,maxLon=-180;
+    points.forEach(function(p){
+      minLat=Math.min(minLat,p.lat); maxLat=Math.max(maxLat,p.lat);
+      minLon=Math.min(minLon,p.lon); maxLon=Math.max(maxLon,p.lon);
+    });
+    var dLat=Math.max(.01,(maxLat-minLat)*.18);
+    var dLon=Math.max(.01,(maxLon-minLon)*.18);
+    return {minLat:minLat-dLat,maxLat:maxLat+dLat,minLon:minLon-dLon,maxLon:maxLon+dLon};
+  }
+  function allPts(){
+    var a=[];
+    if(state.pos) a.push({lat:state.pos.coords.latitude,lon:state.pos.coords.longitude,name:"GPS"});
+    a=a.concat(state.route);
+    state.zones.forEach(function(z){ a=a.concat(z.points); });
+    return a.concat(state.objects);
+  }
+  function draw(){
+    var c = el("leaflet-fallback-canvas");
+    if(!c) return;
+    var rect = c.getBoundingClientRect();
+    var scale = window.devicePixelRatio || 1;
+    var w = Math.max(320, Math.floor(rect.width || 600));
+    var h = Math.max(300, Math.floor(rect.height || 420));
+    c.width = w * scale;
+    c.height = h * scale;
+    var ctx = c.getContext("2d");
+    ctx.setTransform(scale,0,0,scale,0,0);
+    ctx.fillStyle="#010701";
+    ctx.fillRect(0,0,w,h);
+
+    ctx.strokeStyle="rgba(157,255,97,.12)";
+    ctx.lineWidth=1;
+    for(var x=0;x<w;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+    for(var y=0;y<h;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+
+    var b = bounds(allPts());
+    var pad=28;
+    function px(p){
+      return {
+        x:pad+(p.lon-b.minLon)/(b.maxLon-b.minLon||1)*(w-pad*2),
+        y:h-pad-(p.lat-b.minLat)/(b.maxLat-b.minLat||1)*(h-pad*2)
+      };
+    }
+
+    state.zones.forEach(function(z){
+      ctx.beginPath();
+      z.points.forEach(function(p,i){
+        var q=px(p);
+        if(i) ctx.lineTo(q.x,q.y); else ctx.moveTo(q.x,q.y);
+      });
+      ctx.closePath();
+      ctx.fillStyle="rgba(157,255,97,.06)";
+      ctx.strokeStyle="rgba(157,255,97,.58)";
+      ctx.lineWidth=1.5;
+      ctx.fill(); ctx.stroke();
+      var q=px(z.points[0]);
+      ctx.fillStyle="rgba(157,255,97,.75)";
+      ctx.font="10px monospace";
+      ctx.fillText((z.name||"ZONE").slice(0,18), q.x+4, q.y-4);
+    });
+
+    if(state.route.length >= 2){
+      ctx.beginPath();
+      state.route.forEach(function(p,i){
+        var q=px(p);
+        if(i) ctx.lineTo(q.x,q.y); else ctx.moveTo(q.x,q.y);
+      });
+      ctx.strokeStyle="rgba(157,255,97,.95)";
+      ctx.lineWidth=2;
+      ctx.stroke();
+    }
+
+    function dot(p,color,r,label){
+      var q=px(p);
+      ctx.beginPath();
+      ctx.arc(q.x,q.y,r||4,0,Math.PI*2);
+      ctx.fillStyle=color;
+      ctx.fill();
+      ctx.strokeStyle="rgba(1,7,1,.95)";
+      ctx.stroke();
+      if(label){
+        ctx.fillStyle=color;
+        ctx.font="10px monospace";
+        ctx.fillText(label,q.x+6,q.y-6);
+      }
+    }
+
+    state.route.forEach(function(p,i){
+      dot(p,"rgba(157,255,97,.95)",3.5,i===0?"START":(i===state.route.length-1?"FINISH":""));
+    });
+    state.objects.slice(0,80).forEach(function(p){ dot(p,"rgba(217,255,95,.75)",3,""); });
+
+    if(state.pos){
+      var gp = {lat:state.pos.coords.latitude, lon:state.pos.coords.longitude};
+      dot(gp,"rgba(0,220,255,.95)",6,"GPS");
+      var q=px(gp);
+      ctx.beginPath(); ctx.arc(q.x,q.y,14,0,Math.PI*2);
+      ctx.strokeStyle="rgba(0,220,255,.35)";
+      ctx.lineWidth=2; ctx.stroke();
+    }else{
+      ctx.fillStyle="rgba(157,255,97,.55)";
+      ctx.font="13px monospace";
+      ctx.fillText("Leaflet не нужен · резервная карта активна",24,34);
+    }
+
+    var cap = el("lfm-status");
+    if(cap) cap.textContent = "route " + state.route.length + " · zones " + state.zones.length + " · objects " + state.objects.length + (state.pos ? " · GPS OK" : " · GPS —");
+  }
+
+  function requestGps(){
+    if(location.protocol !== "https:" && location.hostname !== "localhost"){
+      log("GPS нужен HTTPS.");
+      return;
+    }
+    if(!navigator.geolocation){
+      log("Geolocation API недоступен.");
+      return;
+    }
+    log("Запрашиваю GPS...");
+    navigator.geolocation.getCurrentPosition(function(pos){
+      state.pos = pos;
+      log("GPS OK: " + pos.coords.latitude.toFixed(6) + ", " + pos.coords.longitude.toFixed(6) + " ±" + Math.round(pos.coords.accuracy) + "м");
+      draw();
+    }, function(err){
+      var text = err.code===1 ? "Доступ запрещён" : err.code===2 ? "Позиция недоступна" : err.code===3 ? "Таймаут" : "Ошибка";
+      log("GPS: " + text + ". Разреши геопозицию в Safari.");
+      draw();
+    }, {enableHighAccuracy:true, timeout:15000, maximumAge:30000});
+  }
+
+  function findMapPage(){
+    return el("tab-map") || el("map") || Array.from(document.querySelectorAll(".page")).find(function(p){
+      var t=(p.textContent||"").toLowerCase();
+      return t.includes("leaflet") || t.includes("карта недоступна") || p.id.toLowerCase().includes("map");
+    });
+  }
+
+  function installFallback(){
+    var page = findMapPage();
+    if(!page) return false;
+
+    if(page.querySelector("#leaflet-fallback-canvas")){
+      loadData();
+      draw();
+      return true;
+    }
+
+    // If Leaflet is loaded and real map exists, don't destroy it.
+    // But if message says Leaflet not loaded, replace content.
+    var txt = (page.textContent || "").toLowerCase();
+    if(window.L && !txt.includes("leaflet не загрузилась") && !txt.includes("карта недоступна")){
+      return true;
+    }
+
+    page.innerHTML =
+      '<div class="leaflet-fallback-map">' +
+        '<div class="lfm-head"><b>Резервная карта активна.</b><br>Leaflet не загружен, поэтому AvisCalc показывает оффлайн-карту без внешних тайлов. Здесь будут GPS, маршрут, зоны и точки из локального хранилища.</div>' +
+        '<div class="lfm-actions">' +
+          '<button class="lfm-btn primary" id="lfm-gps">Запросить GPS</button>' +
+          '<button class="lfm-btn" id="lfm-refresh">Обновить карту</button>' +
+          '<button class="lfm-btn" id="lfm-clear">Очистить лог</button>' +
+        '</div>' +
+        '<div class="lfm-canvas-wrap">' +
+          '<canvas id="leaflet-fallback-canvas"></canvas>' +
+          '<div class="lfm-caption" id="lfm-status">offline map</div>' +
+        '</div>' +
+        '<div class="lfm-log" id="lfm-log">OFFLINE MAP READY\\n</div>' +
+      '</div>';
+
+    var gps = el("lfm-gps"); if(gps) gps.addEventListener("click", requestGps);
+    var refresh = el("lfm-refresh"); if(refresh) refresh.addEventListener("click", function(){ loadData(); draw(); log("Карта обновлена."); });
+    var clear = el("lfm-clear"); if(clear) clear.addEventListener("click", function(){ var x=el("lfm-log"); if(x)x.textContent=""; });
+
+    loadData();
+    setTimeout(draw,100);
+    return true;
+  }
+
+  function patchShowTab(){
+    if(window.__leafletFallbackPatched) return;
+    window.__leafletFallbackPatched = true;
+    if(typeof window.showTab === "function"){
+      var old = window.showTab;
+      window.showTab = function(t){
+        var result = old.apply(this, arguments);
+        if(String(t).toLowerCase().includes("map") || String(t).toLowerCase().includes("карта")){
+          setTimeout(installFallback, 80);
+        }else{
+          setTimeout(function(){
+            var active = document.querySelector(".page.active");
+            if(active && ((active.textContent||"").toLowerCase().includes("leaflet не загрузилась") || active.id.toLowerCase().includes("map"))){
+              installFallback();
+            }
+          },80);
+        }
+        return result;
+      };
+    }
+  }
+
+  function init(){
+    patchShowTab();
+    setTimeout(installFallback, 600);
+    window.addEventListener("resize", function(){ setTimeout(draw,100); });
+  }
+
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+// END SAFE ADDON — MAP LEAFLET FALLBACK
