@@ -4725,384 +4725,239 @@ body.compact-mode .aircraft-item p{
 }
 /* END SAFE ADDON — COMPACT MODE V1 */
 
-/* SAFE ADDON — DESIGN HUB V2 */
-body.design-v2{--status-blue:#5ddcff;--status-green:#9dff61;--status-amber:#d9ff5f;--status-red:#ff5f5f}
-body.theme-amber{--ac:#ffbf47;--ac2:#c98522;--tx:#ffe0a6;--mu:#a88451;--am:#ffd65f;--rd:#ff675f;--lcd-glow:rgba(255,191,71,.55)}
-body.theme-blue{--ac:#5ddcff;--ac2:#3aa6c9;--tx:#c8f5ff;--mu:#6e9fab;--am:#ffd65f;--rd:#ff675f;--lcd-glow:rgba(93,220,255,.45)}
-.design-bottom{position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);z-index:99998;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:6px;border:1px solid rgba(157,255,97,.20);background:rgba(1,7,1,.94);border-radius:8px;box-shadow:0 0 20px rgba(0,0,0,.45),inset 0 0 18px rgba(157,255,97,.04);backdrop-filter:blur(6px)}
-.design-tab{border:1px solid #28401e;background:linear-gradient(180deg,#172013,#050905);color:var(--tx);border-radius:6px;font-family:var(--mono,monospace);text-transform:uppercase;letter-spacing:.8px;padding:8px 5px;cursor:pointer;font-size:10px;min-height:44px;display:grid;place-items:center;gap:2px}
-.design-tab b{font-size:11px;color:inherit}.design-tab small{font-size:8px;color:var(--mu)}.design-tab.active{color:var(--ac);border-color:var(--ac2);background:linear-gradient(180deg,#173a12,#061406);text-shadow:0 0 8px var(--lcd-glow)}
-body.design-v2 .retro-nav{display:none!important}body.design-v2 .scroll,body.design-v2 main{padding-bottom:84px!important}
-.design-home{display:grid;gap:12px}.design-home-hero{border:1px solid #22451d;border-radius:6px;background:radial-gradient(circle at 80% 22%,rgba(157,255,97,.12),transparent 35%),linear-gradient(180deg,rgba(8,22,8,.98),rgba(2,8,2,.99));padding:14px;box-shadow:inset 0 0 24px rgba(157,255,97,.045)}
-.design-home-kicker{color:var(--mu);font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px}.design-home-title{color:var(--ac);font-size:28px;line-height:1;letter-spacing:3px;text-transform:uppercase;text-shadow:0 0 14px var(--lcd-glow)}.design-home-sub{color:var(--tx);font-size:11px;line-height:1.55;margin-top:8px}
-.design-status-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.design-status-card{border:1px solid #22451d;background:#020b02;border-radius:5px;padding:10px;box-shadow:inset 0 0 18px rgba(157,255,97,.045)}.design-status-card span{display:block;color:var(--mu);font-size:8px;letter-spacing:1.1px;text-transform:uppercase}.design-status-card b{display:block;color:var(--ac);font-size:18px;margin-top:6px;line-height:1.1;text-shadow:0 0 10px var(--lcd-glow)}
-.design-quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.design-quick-btn{border:1px solid #28401e;background:linear-gradient(180deg,#172013,#050905);color:var(--tx);border-radius:6px;font-family:var(--mono,monospace);text-transform:uppercase;letter-spacing:1px;padding:13px 8px;cursor:pointer;font-size:10px;min-height:58px}.design-quick-btn.primary{color:var(--ac);border-color:var(--ac2);background:linear-gradient(180deg,#173a12,#061406);text-shadow:0 0 8px var(--lcd-glow)}
-.more-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.more-tile{border:1px solid #22451d;background:radial-gradient(circle at 70% 20%,rgba(157,255,97,.08),transparent 36%),linear-gradient(180deg,#071407,#020802);border-radius:6px;padding:14px 12px;min-height:86px;color:var(--tx);font-family:var(--mono,monospace);cursor:pointer;display:grid;align-content:space-between;box-shadow:inset 0 0 18px rgba(157,255,97,.04)}.more-tile .ico{color:var(--ac);font-size:22px;text-shadow:0 0 10px var(--lcd-glow)}.more-tile b{color:var(--ac);font-size:13px;letter-spacing:1px;text-transform:uppercase;margin-top:8px}.more-tile small{color:var(--mu);font-size:9px;line-height:1.35}
-.theme-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.theme-btn{border:1px solid #28401e;background:linear-gradient(180deg,#172013,#050905);color:var(--tx);border-radius:5px;font-family:var(--mono,monospace);text-transform:uppercase;letter-spacing:.8px;padding:10px 8px;cursor:pointer;font-size:10px}.theme-btn.active{color:var(--ac);border-color:var(--ac2);background:linear-gradient(180deg,#173a12,#061406)}
-body.flight-mode .design-bottom{grid-template-columns:repeat(3,minmax(0,1fr))}body.flight-mode .design-tab[data-target="home"]{display:none}body.flight-mode .fi-hero,body.flight-mode .gps-hero,body.flight-mode .nav-hero,body.flight-mode .hero{display:none!important}body.flight-mode .nav-big b{font-size:34px!important}body.flight-mode .nav-map-wrap,body.flight-mode #nav-mode-canvas{min-height:470px!important;height:470px!important}.flight-indicator{position:fixed;left:10px;top:calc(env(safe-area-inset-top,0px) + 44px);z-index:99999;display:none;border:1px solid rgba(217,255,95,.35);background:rgba(45,45,7,.78);color:var(--am);font-family:var(--mono,monospace);font-size:9px;letter-spacing:1px;padding:7px 9px;border-radius:4px;text-transform:uppercase}body.flight-mode .flight-indicator{display:block}
-@media(max-width:620px){.design-quick{grid-template-columns:1fr}.theme-row{grid-template-columns:1fr}}
-/* END SAFE ADDON — DESIGN HUB V2 */
+/* SAFE ADDON — SIMPLE EFB DESIGN */
 
-/* SAFE ADDON — DESIGN V3 CLEAN EFB */
+/*
+  Simple EFB:
+  - без новых экранов;
+  - без наложений;
+  - без экспериментальной нижней плашки;
+  - только спокойный современный внешний вид.
+*/
 
-body.clean-efb-v3{
-  --efb-bg:#05090d;
-  --efb-panel:#0b1518;
-  --efb-panel-2:#071012;
-  --efb-line:rgba(93,220,255,.20);
-  --efb-blue:#5ddcff;
-  --efb-green:#9dff61;
-  --efb-amber:#ffd65f;
-  --efb-red:#ff675f;
-  --efb-muted:#6e9fab;
-  --efb-text:#d7fbff;
+body.simple-efb{
+  --ac:#58d8ff;
+  --ac2:#2d8fb0;
+  --tx:#d8f7ff;
+  --mu:#76929b;
+  --am:#ffd166;
+  --rd:#ff6b6b;
+  --lcd-glow:rgba(88,216,255,.38);
+  background:#06090d!important;
 }
 
-/* Полностью убираем старую нижнюю плашку Design v2 */
-body.clean-efb-v3 .design-bottom{
+/* На всякий случай полностью отключаем Design v2/v3 элементы, если они остались в DOM */
+body.simple-efb .design-bottom,
+body.simple-efb .clean-topbar,
+body.simple-efb #tab-clean-home,
+body.simple-efb #tab-home-v2,
+body.simple-efb #tab-more-v2,
+body.simple-efb .flight-indicator{
   display:none!important;
 }
 
-/* Старую ретро-навигацию тоже прячем на clean-главной, но рабочие экраны остаются доступны через карточки */
-body.clean-efb-v3.clean-home-active .retro-nav{
-  display:none!important;
-}
-
-/* Убираем лишний нижний отступ после старого меню */
-body.clean-efb-v3 .scroll,
-body.clean-efb-v3 main{
-  padding-bottom:18px!important;
-}
-
-.clean-topbar{
-  position:fixed;
-  left:10px;
-  right:10px;
-  top:calc(env(safe-area-inset-top,0px) + 8px);
-  z-index:100001;
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  gap:8px;
-  align-items:center;
-  border:1px solid var(--efb-line);
-  background:rgba(5,9,13,.90);
-  color:var(--efb-text);
-  border-radius:10px;
-  padding:8px 10px;
-  font-family:var(--mono,monospace);
-  backdrop-filter:blur(8px);
-  box-shadow:0 0 22px rgba(0,0,0,.45), inset 0 0 18px rgba(93,220,255,.04);
-}
-
-.clean-topbar .brand{
-  color:var(--efb-blue);
-  font-size:12px;
-  letter-spacing:2px;
-  text-shadow:0 0 10px rgba(93,220,255,.55);
-  white-space:nowrap;
-}
-
-.clean-topbar .status{
-  color:var(--efb-muted);
-  font-size:9px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  text-align:center;
-}
-
-.clean-topbar .home-btn{
-  border:1px solid rgba(93,220,255,.25);
-  background:rgba(7,16,18,.95);
-  color:var(--efb-green);
-  border-radius:7px;
-  font-family:var(--mono,monospace);
-  padding:6px 8px;
-  font-size:10px;
-  letter-spacing:1px;
-  cursor:pointer;
-}
-
-.clean-home{
-  display:grid;
-  gap:14px;
-  padding:54px 12px 18px!important;
-  min-height:100vh;
+/* Общий фон приложения */
+body.simple-efb .scroll,
+body.simple-efb main,
+body.simple-efb .app,
+body.simple-efb .shell{
   background:
-    radial-gradient(circle at 50% 10%,rgba(93,220,255,.10),transparent 34%),
-    radial-gradient(circle at 70% 56%,rgba(157,255,97,.08),transparent 28%),
-    linear-gradient(180deg,#05090d,#020405);
-  color:var(--efb-text);
+    radial-gradient(circle at 50% 0%, rgba(88,216,255,.08), transparent 34%),
+    linear-gradient(180deg,#070b10,#030507)!important;
 }
 
-.clean-hero{
-  border:1px solid var(--efb-line);
+/* Убираем избыток декоративного свечения и делаем панели спокойнее */
+body.simple-efb .panel,
+body.simple-efb .card,
+body.simple-efb .nav-panel,
+body.simple-efb .gps-panel,
+body.simple-efb .fi-panel,
+body.simple-efb .da42t-panel,
+body.simple-efb .da42-panel,
+body.simple-efb .aircraft-card,
+body.simple-efb .plane-card,
+body.simple-efb .aircraft-item{
+  border-color:rgba(88,216,255,.20)!important;
+  background:linear-gradient(180deg,rgba(12,20,26,.94),rgba(6,10,14,.98))!important;
+  border-radius:12px!important;
+  box-shadow:0 8px 26px rgba(0,0,0,.28), inset 0 0 18px rgba(88,216,255,.035)!important;
+}
+
+/* Заголовки */
+body.simple-efb .hero,
+body.simple-efb .nav-hero,
+body.simple-efb .gps-hero,
+body.simple-efb .fi-hero,
+body.simple-efb .da42t-hero,
+body.simple-efb .da42-hero{
+  border-color:rgba(88,216,255,.20)!important;
   background:
-    linear-gradient(180deg,rgba(11,21,24,.94),rgba(5,9,13,.98));
-  border-radius:14px;
-  padding:16px;
-  box-shadow:inset 0 0 28px rgba(93,220,255,.045),0 0 30px rgba(0,0,0,.35);
-  overflow:hidden;
-  position:relative;
+    radial-gradient(circle at 80% 20%,rgba(88,216,255,.12),transparent 35%),
+    linear-gradient(180deg,rgba(13,24,31,.94),rgba(6,10,14,.98))!important;
+  border-radius:14px!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.25), inset 0 0 24px rgba(88,216,255,.04)!important;
 }
 
-.clean-hero::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    linear-gradient(90deg,transparent,rgba(93,220,255,.05),transparent),
-    repeating-linear-gradient(to bottom,rgba(93,220,255,.035) 0 1px,transparent 1px 7px);
-  pointer-events:none;
-  opacity:.65;
+body.simple-efb .hero::before,
+body.simple-efb .nav-hero::before,
+body.simple-efb .gps-hero::before,
+body.simple-efb .fi-hero::before{
+  opacity:.25!important;
 }
 
-.clean-hero > *{position:relative;z-index:1}
-
-.clean-kicker{
-  color:var(--efb-muted);
-  font-family:var(--mono,monospace);
-  font-size:9px;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  margin-bottom:8px;
+body.simple-efb h1,
+body.simple-efb .title,
+body.simple-efb .nav-title,
+body.simple-efb .gps-title,
+body.simple-efb .fi-title,
+body.simple-efb .da42t-title,
+body.simple-efb .da42-title{
+  color:#58d8ff!important;
+  text-shadow:0 0 14px rgba(88,216,255,.34)!important;
+  letter-spacing:2px!important;
 }
 
-.clean-title{
-  color:var(--efb-blue);
-  font-family:var(--mono,monospace);
-  font-size:30px;
-  line-height:1;
-  letter-spacing:3px;
-  text-transform:uppercase;
-  text-shadow:0 0 14px rgba(93,220,255,.55);
+/* Малые подписи */
+body.simple-efb .kicker,
+body.simple-efb .nav-kicker,
+body.simple-efb .gps-kicker,
+body.simple-efb .fi-kicker,
+body.simple-efb .da42t-kicker,
+body.simple-efb .da42-kicker{
+  color:#76929b!important;
 }
 
-.clean-sub{
-  color:var(--efb-text);
-  opacity:.82;
-  font-family:var(--mono,monospace);
-  font-size:11px;
-  line-height:1.55;
-  margin-top:9px;
+/* Карточки KPI */
+body.simple-efb .kpi,
+body.simple-efb .nav-big,
+body.simple-efb .nav-mini,
+body.simple-efb .gps-kpi,
+body.simple-efb .fi-kpi,
+body.simple-efb .da42t-card,
+body.simple-efb .da42-card{
+  border-color:rgba(88,216,255,.18)!important;
+  background:rgba(5,10,14,.92)!important;
+  border-radius:10px!important;
 }
 
-.clean-mission-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
+body.simple-efb .kpi b,
+body.simple-efb .nav-big b,
+body.simple-efb .nav-mini b,
+body.simple-efb .gps-kpi b,
+body.simple-efb .fi-kpi b,
+body.simple-efb .da42t-card b,
+body.simple-efb .da42-card b{
+  color:#b8f4ff!important;
+  text-shadow:0 0 10px rgba(88,216,255,.28)!important;
 }
 
-.clean-mission-card{
-  border:1px solid var(--efb-line);
-  background:linear-gradient(180deg,rgba(11,21,24,.95),rgba(5,9,13,.98));
-  border-radius:12px;
-  padding:12px;
-  min-height:74px;
-  box-shadow:inset 0 0 20px rgba(93,220,255,.035);
+/* Кнопки */
+body.simple-efb button,
+body.simple-efb .nav-btn,
+body.simple-efb .gps-btn,
+body.simple-efb .fi-btn,
+body.simple-efb .da42t-btn,
+body.simple-efb .da42-btn{
+  border-color:rgba(88,216,255,.22)!important;
+  background:linear-gradient(180deg,#122029,#081016)!important;
+  color:#d8f7ff!important;
+  border-radius:10px!important;
 }
 
-.clean-mission-card span{
-  display:block;
-  color:var(--efb-muted);
-  font-family:var(--mono,monospace);
-  font-size:8px;
-  letter-spacing:1.2px;
-  text-transform:uppercase;
+body.simple-efb button.primary,
+body.simple-efb .nav-btn.primary,
+body.simple-efb .gps-btn.primary,
+body.simple-efb .fi-btn.primary{
+  border-color:rgba(120,255,160,.34)!important;
+  background:linear-gradient(180deg,#12301f,#08160d)!important;
+  color:#9dffb0!important;
 }
 
-.clean-mission-card b{
-  display:block;
-  color:var(--efb-green);
-  font-family:var(--mono,monospace);
-  font-size:20px;
-  margin-top:7px;
-  line-height:1.05;
-  text-shadow:0 0 10px rgba(157,255,97,.45);
+/* Нижнее штатное меню оставляем, но делаем проще и компактнее */
+body.simple-efb .retro-nav{
+  border-color:rgba(88,216,255,.18)!important;
+  background:rgba(5,10,14,.94)!important;
+  border-radius:14px!important;
+  box-shadow:0 -8px 26px rgba(0,0,0,.34), inset 0 0 18px rgba(88,216,255,.035)!important;
 }
 
-.clean-actions{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
+body.simple-efb .retro-nav-btn{
+  border-color:rgba(88,216,255,.16)!important;
+  background:rgba(10,18,24,.92)!important;
+  border-radius:11px!important;
+  color:#d8f7ff!important;
 }
 
-.clean-action{
-  border:1px solid var(--efb-line);
-  background:
-    radial-gradient(circle at 82% 20%,rgba(93,220,255,.10),transparent 34%),
-    linear-gradient(180deg,rgba(11,21,24,.96),rgba(5,9,13,.99));
-  color:var(--efb-text);
-  border-radius:14px;
-  padding:14px;
-  min-height:112px;
-  cursor:pointer;
-  font-family:var(--mono,monospace);
-  text-align:left;
-  display:grid;
-  align-content:space-between;
-  box-shadow:inset 0 0 24px rgba(93,220,255,.035),0 0 18px rgba(0,0,0,.25);
+body.simple-efb .retro-nav-btn.active{
+  border-color:rgba(120,255,160,.55)!important;
+  background:linear-gradient(180deg,#12301f,#08160d)!important;
+  color:#9dffb0!important;
+  box-shadow:0 0 18px rgba(120,255,160,.12)!important;
 }
 
-.clean-action.primary{
-  border-color:rgba(157,255,97,.38);
-  background:
-    radial-gradient(circle at 82% 20%,rgba(157,255,97,.14),transparent 34%),
-    linear-gradient(180deg,rgba(12,28,15,.96),rgba(5,9,13,.99));
+body.simple-efb .retro-nav-btn b{
+  letter-spacing:1px!important;
 }
 
-.clean-action .ico{
-  color:var(--efb-blue);
-  font-size:26px;
-  text-shadow:0 0 12px rgba(93,220,255,.55);
+/* Таблицы */
+body.simple-efb table,
+body.simple-efb .nav-route-table,
+body.simple-efb .fi-table,
+body.simple-efb .da42t-table,
+body.simple-efb .da42-table{
+  background:#050a0e!important;
 }
 
-.clean-action.primary .ico{
-  color:var(--efb-green);
-  text-shadow:0 0 12px rgba(157,255,97,.55);
+body.simple-efb th{
+  background:#0e1a21!important;
+  color:#58d8ff!important;
+  border-color:rgba(88,216,255,.18)!important;
 }
 
-.clean-action b{
-  display:block;
-  color:var(--efb-text);
-  font-size:15px;
-  letter-spacing:1.3px;
-  text-transform:uppercase;
-  margin-top:12px;
+body.simple-efb td{
+  border-color:rgba(88,216,255,.10)!important;
 }
 
-.clean-action small{
-  display:block;
-  color:var(--efb-muted);
-  font-size:9px;
-  line-height:1.35;
-  margin-top:5px;
+/* Карты/canvas */
+body.simple-efb .nav-map-wrap,
+body.simple-efb .gps-map-wrap,
+body.simple-efb .lfm-canvas-wrap{
+  border-color:rgba(88,216,255,.22)!important;
+  border-radius:12px!important;
+  background:#03070a!important;
 }
 
-.clean-section-title{
-  color:var(--efb-muted);
-  font-family:var(--mono,monospace);
-  font-size:10px;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  margin:2px 0 -4px;
+/* Стартовые старые экраны — оставляем, но они становятся менее конфликтными */
+body.simple-efb .compact-toggle{
+  border-radius:10px!important;
+  border-color:rgba(88,216,255,.25)!important;
+  background:rgba(8,16,22,.92)!important;
+  color:#b8f4ff!important;
 }
 
-.clean-menu-grid{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:8px;
-}
-
-.clean-mini{
-  border:1px solid rgba(93,220,255,.18);
-  background:rgba(7,16,18,.88);
-  color:var(--efb-muted);
-  border-radius:10px;
-  padding:10px 6px;
-  min-height:62px;
-  cursor:pointer;
-  font-family:var(--mono,monospace);
-  display:grid;
-  place-items:center;
-  text-align:center;
-  gap:5px;
-}
-
-.clean-mini .ico{
-  color:var(--efb-blue);
-  font-size:17px;
-}
-
-.clean-mini b{
-  color:var(--efb-text);
-  font-size:8px;
-  letter-spacing:.8px;
-  text-transform:uppercase;
-}
-
-.clean-flight-strip{
-  border:1px solid rgba(255,214,95,.22);
-  background:rgba(45,38,7,.26);
-  color:var(--efb-amber);
-  border-radius:12px;
-  padding:11px 12px;
-  font-family:var(--mono,monospace);
-  font-size:10px;
-  line-height:1.5;
-}
-
-.clean-hide{
-  display:none!important;
-}
-
-body.clean-efb-v3 .compact-toggle{
-  top:calc(env(safe-area-inset-top,0px) + 54px)!important;
-}
-
+/* На телефоне делаем плотнее */
 @media(max-width:620px){
-  .clean-actions{grid-template-columns:1fr}
-  .clean-menu-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-  .clean-title{font-size:26px}
-  .clean-mission-card b{font-size:17px}
-}
-/* END SAFE ADDON — DESIGN V3 CLEAN EFB */
+  body.simple-efb .page{
+    padding:10px!important;
+  }
 
-/* SAFE ADDON — DESIGN V3 LAYER FIX */
+  body.simple-efb .hero,
+  body.simple-efb .nav-hero,
+  body.simple-efb .gps-hero,
+  body.simple-efb .fi-hero{
+    padding:14px!important;
+  }
 
-/* Когда открыта Clean-главная, прячем все старые экраны внутри scroll */
-body.clean-home-active .scroll > *:not(#tab-clean-home){
-  display:none!important;
-}
+  body.simple-efb .retro-nav{
+    margin:6px!important;
+    padding:6px!important;
+    gap:6px!important;
+  }
 
-/* На Clean-главной старый Design v2 экран тоже не должен просвечивать */
-body.clean-home-active #tab-home-v2,
-body.clean-home-active #tab-more-v2,
-body.clean-home-active .design-home:not(#tab-clean-home .design-home){
-  display:none!important;
-}
-
-/* Clean-главная становится нормальным экраном, не наложением */
-body.clean-home-active #tab-clean-home{
-  display:grid!important;
-  position:relative!important;
-  z-index:5!important;
-  width:100%!important;
-  min-height:100vh!important;
-  box-sizing:border-box!important;
+  body.simple-efb .retro-nav-btn{
+    min-width:70px!important;
+    padding:8px 6px!important;
+  }
 }
 
-/* Убираем верхние старые панели только на clean-главной */
-body.clean-home-active .lcd-panel,
-body.clean-home-active .top-panel,
-body.clean-home-active .header-panel,
-body.clean-home-active .status-panel{
-  display:none!important;
-}
-
-/* Но если пользователь ушёл с главной — всё возвращается */
-body:not(.clean-home-active) #tab-clean-home{
-  display:none!important;
-}
-
-/* Чтобы верхняя строка не закрывала рабочий контент */
-body.clean-efb-v3 .scroll{
-  padding-top:58px!important;
-}
-
-/* Clean Home сама уже имеет отступ, поэтому двойной не нужен */
-body.clean-home-active #tab-clean-home.clean-home{
-  padding-top:58px!important;
-}
-
-/* Полностью отключаем старую нижнюю плашку Design v2 */
-body.clean-efb-v3 .design-bottom{
-  display:none!important;
-}
-
-/* Старый экран Сегодня/Полёт от Design v2 не нужен в V3 */
-body.clean-efb-v3 #tab-home-v2{
-  display:none!important;
-}
-
-/* END SAFE ADDON — DESIGN V3 LAYER FIX */
+/* END SAFE ADDON — SIMPLE EFB DESIGN */
