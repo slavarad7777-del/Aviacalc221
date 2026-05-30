@@ -1,2 +1,2 @@
-AvisCalc Stable Web/PWA v0.9.3
-Added: M25 / Zones DA module with best-effort uncertain data.
+AvisCalc Stable Web/PWA v0.9.4
+Added: RF Aerodromes starter database module.

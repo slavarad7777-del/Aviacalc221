@@ -6177,3 +6177,31 @@ body.hub-v2 #tab-all-tabs-hub [data-go="home"],body.hub-v2 #tab-all-tabs-hub [da
   }
 }
 /* END SAFE ADDON — M25 ZONES MODULE V1 */
+
+/* SAFE ADDON — RF AERODROMES MODULE V1 */
+.rfad-app{display:grid;gap:12px}
+.rfad-hero{border:1px solid rgba(88,216,255,.22);border-radius:12px;padding:13px;background:radial-gradient(circle at 82% 18%,rgba(88,216,255,.12),transparent 34%),linear-gradient(180deg,rgba(13,24,31,.94),rgba(6,10,14,.98));box-shadow:0 10px 26px rgba(0,0,0,.24),inset 0 0 22px rgba(88,216,255,.04)}
+.rfad-kicker{color:var(--mu,#76929b);font-size:8px;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:7px}
+.rfad-title{color:var(--ac,#58d8ff);font-size:23px;line-height:1;letter-spacing:2.2px;text-transform:uppercase;text-shadow:0 0 14px rgba(88,216,255,.34)}
+.rfad-sub{color:var(--tx,#d8f7ff);opacity:.82;font-size:10px;line-height:1.45;margin-top:8px}
+.rfad-warning{border:1px solid rgba(255,209,102,.22);background:rgba(45,38,7,.22);color:#ffd166;border-radius:9px;padding:9px;font-size:10px;line-height:1.45}
+.rfad-toolbar{display:grid;grid-template-columns:1fr auto;gap:8px}
+.rfad-search{border:1px solid rgba(88,216,255,.18);background:#050a0e;color:var(--tx,#d8f7ff);border-radius:9px;padding:9px 10px;font-family:var(--mono,monospace);font-size:11px;outline:none}
+.rfad-btn{border:1px solid rgba(88,216,255,.22);background:linear-gradient(180deg,#122029,#081016);color:var(--tx,#d8f7ff);border-radius:9px;padding:9px 10px;font-family:var(--mono,monospace);text-transform:uppercase;letter-spacing:.8px;font-size:9px;cursor:pointer}
+.rfad-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rfad-chip{border:1px solid rgba(88,216,255,.16);background:rgba(5,10,14,.92);border-radius:9px;padding:8px}
+.rfad-chip span{display:block;color:var(--mu,#76929b);font-size:7px;letter-spacing:.9px;text-transform:uppercase}
+.rfad-chip b{display:block;color:#b8f4ff;font-size:14px;margin-top:4px}
+.rfad-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.rfad-card{border:1px solid rgba(88,216,255,.18);background:linear-gradient(180deg,rgba(12,20,26,.94),rgba(6,10,14,.98));border-radius:12px;padding:10px;display:grid;gap:8px;box-shadow:0 8px 22px rgba(0,0,0,.20),inset 0 0 16px rgba(88,216,255,.03)}
+.rfad-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.rfad-card h3{margin:0;color:#e8fbff;font-size:15px;line-height:1.05;letter-spacing:1px;text-transform:uppercase}
+.rfad-call{color:#9dffb0;font-size:11px;margin-top:5px}
+.rfad-badge{border:1px solid rgba(157,255,176,.24);color:#9dffb0;background:rgba(8,22,12,.72);border-radius:999px;padding:4px 7px;font-size:8px;white-space:nowrap;text-transform:uppercase}
+.rfad-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.rfad-meta div{border:1px solid rgba(88,216,255,.10);background:#050a0e;border-radius:8px;padding:7px}
+.rfad-meta span{display:block;color:#76929b;font-size:7px;letter-spacing:.8px;text-transform:uppercase}
+.rfad-meta strong{display:block;color:#b8f4ff;font-size:10px;margin-top:4px;line-height:1.25}
+.rfad-rto{border:1px solid rgba(255,209,102,.20);background:rgba(45,38,7,.20);color:#ffe3a3;border-radius:9px;padding:8px;font-size:10px;line-height:1.4}
+@media(max-width:760px){.rfad-grid{grid-template-columns:1fr}.rfad-summary{grid-template-columns:1fr}.rfad-toolbar{grid-template-columns:1fr}}
+/* END SAFE ADDON — RF AERODROMES MODULE V1 */
