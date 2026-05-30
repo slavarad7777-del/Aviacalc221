@@ -1,2 +1,2 @@
-AvisCalc Stable Web/PWA v0.9
-Includes: All Tabs Hub, Online Map, Navigator Lite, Alternates, Balashov map page
+AvisCalc Stable Web/PWA v0.9.1 safe restore
+Rollback after alternate cards JS issue. Includes All Tabs Hub, Online Map, Navigator Lite, Alternates, Balashov map page.
