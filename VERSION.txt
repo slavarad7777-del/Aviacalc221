@@ -1,0 +1,2 @@
+AvisCalc Stable Web/PWA v0.9
+Includes: All Tabs Hub, Online Map, Navigator Lite, Alternates, Balashov map page
