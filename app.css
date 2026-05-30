@@ -5935,3 +5935,245 @@ body.hub-v2 #tab-all-tabs-hub [data-go="home"],body.hub-v2 #tab-all-tabs-hub [da
   }
 }
 /* END SAFE ADDON — ABOUT STABILITY V1 */
+
+/* SAFE ADDON — M25 ZONES MODULE V1 */
+.m25-app{
+  display:grid;
+  gap:12px;
+}
+
+.m25-hero{
+  border:1px solid rgba(88,216,255,.22);
+  border-radius:12px;
+  padding:13px;
+  background:
+    radial-gradient(circle at 82% 18%,rgba(88,216,255,.12),transparent 34%),
+    linear-gradient(180deg,rgba(13,24,31,.94),rgba(6,10,14,.98));
+  box-shadow:0 10px 26px rgba(0,0,0,.24), inset 0 0 22px rgba(88,216,255,.04);
+}
+
+.m25-kicker{
+  color:var(--mu,#76929b);
+  font-size:8px;
+  letter-spacing:1.8px;
+  text-transform:uppercase;
+  margin-bottom:7px;
+}
+
+.m25-title{
+  color:var(--ac,#58d8ff);
+  font-size:23px;
+  line-height:1;
+  letter-spacing:2.2px;
+  text-transform:uppercase;
+  text-shadow:0 0 14px rgba(88,216,255,.34);
+}
+
+.m25-sub{
+  color:var(--tx,#d8f7ff);
+  opacity:.82;
+  font-size:10px;
+  line-height:1.45;
+  margin-top:8px;
+}
+
+.m25-warning{
+  border:1px solid rgba(255,209,102,.22);
+  background:rgba(45,38,7,.22);
+  color:#ffd166;
+  border-radius:9px;
+  padding:9px;
+  font-size:10px;
+  line-height:1.45;
+}
+
+.m25-tabs{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+
+.m25-tab{
+  border:1px solid rgba(88,216,255,.22);
+  background:linear-gradient(180deg,#122029,#081016);
+  color:var(--tx,#d8f7ff);
+  border-radius:9px;
+  padding:10px 8px;
+  font-family:var(--mono,monospace);
+  text-transform:uppercase;
+  letter-spacing:.8px;
+  font-size:10px;
+  cursor:pointer;
+}
+
+.m25-tab.active{
+  border-color:rgba(120,255,160,.34);
+  background:linear-gradient(180deg,#12301f,#08160d);
+  color:#9dffb0;
+}
+
+.m25-summary{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+
+.m25-chip{
+  border:1px solid rgba(88,216,255,.16);
+  background:rgba(5,10,14,.92);
+  border-radius:9px;
+  padding:8px;
+}
+
+.m25-chip span{
+  display:block;
+  color:var(--mu,#76929b);
+  font-size:7px;
+  letter-spacing:.9px;
+  text-transform:uppercase;
+}
+
+.m25-chip b{
+  display:block;
+  color:#b8f4ff;
+  font-size:14px;
+  margin-top:4px;
+}
+
+.m25-toolbar{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+}
+
+.m25-search{
+  border:1px solid rgba(88,216,255,.18);
+  background:#050a0e;
+  color:var(--tx,#d8f7ff);
+  border-radius:9px;
+  padding:9px 10px;
+  font-family:var(--mono,monospace);
+  font-size:11px;
+  outline:none;
+}
+
+.m25-section{
+  border:1px solid rgba(88,216,255,.16);
+  background:linear-gradient(180deg,rgba(8,15,20,.72),rgba(4,8,12,.86));
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.m25-section-head{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:center;
+  padding:9px 10px;
+  border-bottom:1px solid rgba(88,216,255,.14);
+  color:#58d8ff;
+  font-size:9px;
+  letter-spacing:1.6px;
+  text-transform:uppercase;
+  background:rgba(8,16,22,.72);
+}
+
+.m25-section-head small{
+  color:#76929b;
+  font-size:8px;
+}
+
+.m25-list{
+  padding:10px;
+  display:grid;
+  gap:8px;
+}
+
+.m25-card{
+  border:1px solid rgba(88,216,255,.14);
+  background:#050a0e;
+  border-radius:10px;
+  padding:9px;
+  display:grid;
+  gap:6px;
+}
+
+.m25-card-top{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:flex-start;
+}
+
+.m25-card b{
+  color:#d8f7ff;
+  font-size:12px;
+  letter-spacing:.7px;
+}
+
+.m25-card small{
+  color:#76929b;
+  font-size:8px;
+  line-height:1.35;
+}
+
+.m25-badge{
+  border:1px solid rgba(157,255,176,.24);
+  color:#9dffb0;
+  background:rgba(8,22,12,.72);
+  border-radius:999px;
+  padding:4px 7px;
+  font-size:8px;
+  white-space:nowrap;
+}
+
+.m25-card.zone .m25-badge{
+  border-color:rgba(88,216,255,.24);
+  color:#58d8ff;
+  background:rgba(8,16,28,.72);
+}
+
+.m25-card.point .m25-badge{
+  border-color:rgba(255,209,102,.24);
+  color:#ffd166;
+  background:rgba(45,38,7,.22);
+}
+
+.m25-meta{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
+}
+
+.m25-meta div{
+  border:1px solid rgba(88,216,255,.10);
+  background:rgba(9,15,20,.72);
+  border-radius:7px;
+  padding:6px;
+}
+
+.m25-meta span{
+  display:block;
+  color:#76929b;
+  font-size:7px;
+  text-transform:uppercase;
+  letter-spacing:.8px;
+}
+
+.m25-meta strong{
+  display:block;
+  color:#b8f4ff;
+  font-size:10px;
+  margin-top:3px;
+  line-height:1.25;
+}
+
+@media(max-width:760px){
+  .m25-summary{
+    grid-template-columns:1fr;
+  }
+  .m25-toolbar{
+    grid-template-columns:1fr;
+  }
+}
+/* END SAFE ADDON — M25 ZONES MODULE V1 */

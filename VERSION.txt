@@ -1,2 +1,2 @@
-AvisCalc Stable Web/PWA v0.9.2
-Added: About / Stability screen with cache controls.
+AvisCalc Stable Web/PWA v0.9.3
+Added: M25 / Zones DA module with best-effort uncertain data.
