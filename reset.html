@@ -5,44 +5,37 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AvisCalc Reset</title>
 <style>
-body{margin:0;background:#010701;color:#9dff61;font-family:monospace;display:grid;place-items:center;min-height:100vh}
-.box{max-width:720px;padding:24px;border:1px solid #22451d;background:#041004;border-radius:8px}
-h1{letter-spacing:3px}
-button,a{display:inline-block;margin-top:14px;border:1px solid #64c93a;background:#061406;color:#9dff61;padding:12px 14px;border-radius:4px;font-family:monospace;text-decoration:none}
-pre{color:#6f9f63;white-space:pre-wrap}
+body{margin:0;background:#03070a;color:#9dffb0;font-family:monospace;display:grid;place-items:center;min-height:100vh}
+.box{width:min(720px,calc(100vw - 24px));padding:22px;border:1px solid rgba(88,216,255,.25);background:#071016;border-radius:12px}
+h1{color:#58d8ff;letter-spacing:2px}
+a,button{display:inline-block;margin-top:12px;border:1px solid rgba(157,255,176,.4);background:#08160d;color:#9dffb0;padding:12px 14px;border-radius:8px;font-family:monospace;text-decoration:none}
+pre{color:#76929b;white-space:pre-wrap;line-height:1.45}
 </style>
 </head>
 <body>
 <div class="box">
 <h1>AVISCALC RESET</h1>
-<pre id="log">Очистка service worker и кэша...</pre>
-<a href="./index.html?reset=1">Открыть AvisCalc</a>
+<pre id="log">Очистка service worker и кэшей...</pre>
+<a href="./index.html?fresh=1">Открыть AvisCalc</a>
 </div>
 <script>
 (async function(){
-  const log = document.getElementById("log");
-  function add(t){ log.textContent += "\n" + t; }
-
+  const log=document.getElementById("log");
+  function add(t){log.textContent+="\n"+t}
   try{
     if("serviceWorker" in navigator){
-      const regs = await navigator.serviceWorker.getRegistrations();
-      for(const reg of regs){
-        await reg.unregister();
-        add("Service worker removed");
-      }
-    }else add("Service worker API unavailable");
-  }catch(e){ add("SW error: " + e.message); }
-
+      const regs=await navigator.serviceWorker.getRegistrations();
+      for(const reg of regs){await reg.unregister();add("Service worker removed")}
+      if(!regs.length)add("Service worker not found");
+    }
+  }catch(e){add("SW error: "+e.message)}
   try{
     if(window.caches){
-      const keys = await caches.keys();
-      for(const key of keys){
-        await caches.delete(key);
-        add("Cache removed: " + key);
-      }
-    }else add("Cache API unavailable");
-  }catch(e){ add("Cache error: " + e.message); }
-
+      const keys=await caches.keys();
+      for(const key of keys){await caches.delete(key);add("Cache removed: "+key)}
+      if(!keys.length)add("Cache not found");
+    }
+  }catch(e){add("Cache error: "+e.message)}
   add("Готово. Нажми «Открыть AvisCalc».");
 })();
 </script>

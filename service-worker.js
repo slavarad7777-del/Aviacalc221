@@ -1,4 +1,4 @@
-// AvisCalc emergency service worker killer
+// AvisCalc emergency service worker killer v2
 self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
@@ -16,5 +16,5 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", () => {
-  // Do not intercept fetches.
+  // intentionally empty: do not intercept
 });
