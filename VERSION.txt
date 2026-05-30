@@ -1,2 +1,1 @@
-AvisCalc emergency minimal restore
-Purpose: restore launch and clear service worker/cache.
+AvisCalc Emergency Stable + All Tabs Hub Safe Restore v1

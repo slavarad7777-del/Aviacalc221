@@ -7072,3 +7072,122 @@ function zonesViewZoom(val) {
   else init();
 })();
 // END SAFE ADDON — ONLINE MAP MODE
+
+// SAFE ADDON — ALL TABS HUB SAFE RESTORE
+(function(){
+  function el(id){return document.getElementById(id)}
+  function safeJson(k,f){try{var r=localStorage.getItem(k);return r?JSON.parse(r):f}catch(e){return f}}
+
+  var groups = [
+    {title:"Полёт", note:"основное", items:[
+      {title:"NAV", tab:"nav-mode", icon:"◉", desc:"Планшет", primary:true},
+      {title:"Карта", tab:"map", icon:"⌖", desc:"OSM / спутник", primary:true},
+      {title:"Штурман", tab:"navigator-lite", icon:"✦", desc:"Расчёты", primary:true},
+      {title:"Самолёты", tab:"aircraft", icon:"✈", desc:"Профили", primary:true}
+    ]},
+    {title:"Навигация", note:"данные", items:[
+      {title:"Чек-листы", tab:"checklists", icon:"☑", desc:"Процедуры"},
+      {title:"Файл", tab:"file-import", icon:"⇪", desc:"Импорт"},
+      {title:"Маршрут", tab:"route", icon:"↗", desc:"Точки"},
+      {title:"Зоны", tab:"zones", icon:"⬡", desc:"Полигоны"}
+    ]},
+    {title:"Сервис", note:"вспом.", items:[
+      {title:"GPS", tab:"gps-map", icon:"⌁", desc:"Диагностика"},
+      {title:"AIP", tab:"aip", icon:"▤", desc:"Сборники"},
+      {title:"ДА-42Т", tab:"da42t", icon:"◆", desc:"РЛЭ"}
+    ]}
+  ];
+
+  function status(){
+    var route=safeJson("aviscalc_imported_route_json",[]);
+    var r=Array.isArray(route)?route.length:0;
+    var zones=safeJson("aviscalc_imported_zones_json",[]);
+    var z=Array.isArray(zones)?zones.length:0;
+    var gps="—";
+    if(window.__aviscalcGpsLastPosition&&window.__aviscalcGpsLastPosition.coords)gps="OK";
+    var nav=(el("nav-status")&&el("nav-status").textContent)||"STBY";
+    var map={"safe-route":r+" WP","safe-zones":z,"safe-gps":gps,"safe-nav":nav};
+    Object.keys(map).forEach(function(k){var x=el(k);if(x)x.textContent=map[k]});
+  }
+
+  function tile(m){
+    return '<button class="safe-tile '+(m.primary?'primary':'')+'" data-safe-go="'+m.tab+'"><div><div class="ico">'+m.icon+'</div><b>'+m.title+'</b><small>'+m.desc+'</small></div></button>';
+  }
+
+  function ensureHub(){
+    if(el("tab-safe-hub"))return;
+    var scroll=document.querySelector(".scroll");
+    if(!scroll)return;
+    var page=document.createElement("div");
+    page.className="page safe-alltabs";
+    page.id="tab-safe-hub";
+    page.innerHTML =
+      '<section class="safe-hero"><div class="safe-kicker">AVISCALC · CONTROL CENTER</div><div class="safe-title">Все вкладки</div><div class="safe-sub">Безопасно восстановленный главный экран. Нижнее меню скрыто.</div></section>'+
+      '<section class="safe-version"><span><b>AvisCalc Emergency Stable</b></span><span>Hub Restore v1</span></section>'+
+      '<section class="safe-status"><div class="safe-chip"><span>Маршрут</span><b id="safe-route">0 WP</b></div><div class="safe-chip"><span>Зоны</span><b id="safe-zones">0</b></div><div class="safe-chip"><span>GPS</span><b id="safe-gps">—</b></div><div class="safe-chip"><span>NAV</span><b id="safe-nav">STBY</b></div></section>'+
+      groups.map(function(g){return '<section class="safe-group"><div class="safe-group-head"><span>'+g.title+'</span><small>'+g.note+'</small></div><div class="safe-grid">'+g.items.map(tile).join("")+'</div></section>'}).join("");
+    scroll.appendChild(page);
+    page.querySelectorAll("[data-safe-go]").forEach(function(b){
+      b.addEventListener("click",function(){go(b.getAttribute("data-safe-go"))});
+    });
+    status();
+  }
+
+  function showHub(){
+    ensureHub();
+    document.body.classList.add("safe-hub-active");
+    document.querySelectorAll(".page").forEach(function(p){p.classList.toggle("active",p.id==="tab-safe-hub")});
+    var sc=document.querySelector(".scroll");if(sc)sc.scrollTop=0;
+    status();
+  }
+
+  function go(tab){
+    document.body.classList.remove("safe-hub-active");
+    if(typeof window.showTab==="function"){
+      try{window.showTab(tab);return}catch(e){}
+    }
+    document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active")});
+    var page=el("tab-"+tab)||el(tab);
+    if(page)page.classList.add("active");
+  }
+
+  function homeButton(){
+    if(el("safe-hub-btn"))return;
+    var b=document.createElement("button");
+    b.id="safe-hub-btn";
+    b.className="safe-hub-btn";
+    b.textContent="Все";
+    b.addEventListener("click",showHub);
+    document.body.appendChild(b);
+  }
+
+  function patchShowTab(){
+    if(window.__safeHubPatched)return;
+    window.__safeHubPatched=true;
+    if(typeof window.showTab==="function"){
+      var old=window.showTab;
+      window.showTab=function(t){
+        if(t==="safe-hub"||t==="all-tabs-hub"||t==="home"){
+          showHub();return;
+        }
+        document.body.classList.remove("safe-hub-active");
+        var res=old.apply(this,arguments);
+        setTimeout(status,80);
+        return res;
+      };
+    }
+  }
+
+  function init(){
+    document.body.classList.add("safe-hub");
+    ensureHub();
+    homeButton();
+    patchShowTab();
+    setTimeout(showHub,900);
+    setInterval(status,12000);
+  }
+
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);
+  else init();
+})();
+// END SAFE ADDON — ALL TABS HUB SAFE RESTORE
