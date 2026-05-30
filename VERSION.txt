@@ -1,2 +1,2 @@
-AvisCalc Stable Web/PWA v0.9.4a
-Fix: Force add RF Aerodromes tile to All Tabs hub.
+AvisCalc Stable Web/PWA v1.0.0-nav-v2-shell
+Added: NAV v2 Shell flight mode screen. Old NAV remains unchanged.
