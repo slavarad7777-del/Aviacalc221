@@ -1,1 +1,2 @@
-AvisCalc Emergency Stable + Force All Tabs Hub v1
+AvisCalc Stable Web/PWA v0.9 rollback before alternate cards v2
+Includes: All Tabs Hub, Online Map, Navigator Lite, Alternates, Balashov map page
