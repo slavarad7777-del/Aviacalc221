@@ -5753,3 +5753,292 @@ body.hub-v2 #tab-all-tabs-hub .alltabs-section-title{
 .hub-version-line span:last-child{color:#9dffb0}
 body.hub-v2 #tab-all-tabs-hub [data-go="home"],body.hub-v2 #tab-all-tabs-hub [data-go="start"],body.hub-v2 #tab-all-tabs-hub [data-go="main"]{display:none!important}
 /* END SAFE ADDON — HUB VERSION POLISH */
+
+/* SAFE ADDON — ALTERNATE CARDS V2 */
+
+/* Красивые карточки запасных аэродромов */
+body.alt-cards-v2 #tab-alternates .alt-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:11px!important;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-card{
+  position:relative;
+  overflow:hidden;
+  border-radius:14px!important;
+  padding:0!important;
+  border:1px solid rgba(88,216,255,.22)!important;
+  background:
+    radial-gradient(circle at 86% 8%,rgba(88,216,255,.16),transparent 30%),
+    linear-gradient(180deg,rgba(13,24,31,.96),rgba(5,10,14,.99))!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.28), inset 0 0 22px rgba(88,216,255,.035)!important;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:4px;
+  background:linear-gradient(180deg,#58d8ff,#9dffb0);
+  opacity:.9;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-card-head{
+  padding:12px 12px 10px 14px!important;
+  border-bottom:1px solid rgba(88,216,255,.14);
+  background:rgba(4,9,13,.34);
+}
+
+body.alt-cards-v2 #tab-alternates .alt-card h3{
+  color:#e8fbff!important;
+  font-size:15px!important;
+  letter-spacing:1.2px!important;
+  line-height:1.05!important;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-card .callsign{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-top:6px!important;
+  color:#9dffb0!important;
+  font-size:11px!important;
+  letter-spacing:.9px;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-card .callsign::before{
+  content:"CALL";
+  color:#76929b;
+  font-size:7px;
+  letter-spacing:1px;
+  border:1px solid rgba(157,255,176,.18);
+  border-radius:5px;
+  padding:2px 4px;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-badge{
+  border-radius:999px!important;
+  padding:6px 8px!important;
+  border:1px solid rgba(157,255,176,.32)!important;
+  background:rgba(8,28,14,.72)!important;
+  color:#9dffb0!important;
+  box-shadow:0 0 14px rgba(157,255,176,.08);
+  font-size:10px!important;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-badge::before{
+  content:"G ";
+  color:#76929b;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-kv{
+  padding:10px 10px 0 14px;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:7px!important;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-kv div{
+  border-radius:10px!important;
+  border:1px solid rgba(88,216,255,.14)!important;
+  background:rgba(3,8,12,.74)!important;
+  padding:8px 7px!important;
+  min-height:54px;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-kv span{
+  font-size:7px!important;
+  letter-spacing:1px!important;
+  color:#76929b!important;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-kv b{
+  color:#b8f4ff!important;
+  font-size:12px!important;
+  line-height:1.25!important;
+  text-shadow:0 0 8px rgba(88,216,255,.22);
+}
+
+body.alt-cards-v2 #tab-alternates .alt-rto{
+  margin:10px 10px 12px 14px;
+  border-radius:11px!important;
+  border:1px solid rgba(255,209,102,.20)!important;
+  background:rgba(45,38,7,.20)!important;
+  color:#ffe3a3!important;
+  font-size:10px!important;
+  line-height:1.42!important;
+  padding:9px 10px!important;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-rto b{
+  color:#ffd166!important;
+  letter-spacing:.6px;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-card-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  padding:0 10px 12px 14px;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-mini-btn{
+  border:1px solid rgba(88,216,255,.18);
+  background:linear-gradient(180deg,#122029,#081016);
+  color:#d8f7ff;
+  border-radius:9px;
+  padding:8px 7px;
+  font-family:var(--mono,monospace);
+  text-transform:uppercase;
+  letter-spacing:.8px;
+  font-size:8px;
+  cursor:pointer;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-mini-btn.primary{
+  border-color:rgba(157,255,176,.28);
+  color:#9dffb0;
+  background:linear-gradient(180deg,#12301f,#08160d);
+}
+
+body.alt-cards-v2 #tab-alternates .alt-toolbar{
+  grid-template-columns:1fr auto auto!important;
+}
+
+body.alt-cards-v2 #tab-alternates .alt-count{
+  border:1px solid rgba(88,216,255,.16);
+  background:rgba(5,10,14,.92);
+  color:#76929b;
+  border-radius:9px;
+  padding:9px 10px;
+  font-family:var(--mono,monospace);
+  font-size:10px;
+  white-space:nowrap;
+}
+
+/* Модальное окно с крупной карточкой */
+.alt-modal-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:100010;
+  background:rgba(0,0,0,.72);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
+}
+
+.alt-modal-backdrop.show{
+  display:flex;
+}
+
+.alt-modal{
+  width:min(720px,100%);
+  max-height:86vh;
+  overflow:auto;
+  border:1px solid rgba(88,216,255,.28);
+  background:
+    radial-gradient(circle at 86% 8%,rgba(88,216,255,.14),transparent 34%),
+    linear-gradient(180deg,#0b151b,#04080c);
+  border-radius:16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.55), inset 0 0 26px rgba(88,216,255,.04);
+  color:#d8f7ff;
+  font-family:var(--mono,monospace);
+}
+
+.alt-modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  padding:16px;
+  border-bottom:1px solid rgba(88,216,255,.16);
+}
+
+.alt-modal-title{
+  color:#e8fbff;
+  font-size:21px;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+  line-height:1;
+}
+
+.alt-modal-call{
+  color:#9dffb0;
+  margin-top:7px;
+  font-size:13px;
+}
+
+.alt-modal-close{
+  border:1px solid rgba(88,216,255,.22);
+  background:#081016;
+  color:#b8f4ff;
+  border-radius:10px;
+  padding:8px 10px;
+  cursor:pointer;
+}
+
+.alt-modal-body{
+  padding:14px;
+  display:grid;
+  gap:10px;
+}
+
+.alt-modal-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+}
+
+.alt-modal-param{
+  border:1px solid rgba(88,216,255,.14);
+  background:#050a0e;
+  border-radius:11px;
+  padding:11px;
+}
+
+.alt-modal-param span{
+  display:block;
+  color:#76929b;
+  font-size:8px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.alt-modal-param b{
+  display:block;
+  margin-top:6px;
+  color:#b8f4ff;
+  font-size:17px;
+  line-height:1.2;
+}
+
+.alt-modal-rto{
+  border:1px solid rgba(255,209,102,.22);
+  background:rgba(45,38,7,.22);
+  color:#ffe3a3;
+  border-radius:11px;
+  padding:12px;
+  line-height:1.45;
+  font-size:12px;
+}
+
+@media(max-width:760px){
+  body.alt-cards-v2 #tab-alternates .alt-grid{
+    grid-template-columns:1fr!important;
+  }
+  body.alt-cards-v2 #tab-alternates .alt-kv{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  body.alt-cards-v2 #tab-alternates .alt-toolbar{
+    grid-template-columns:1fr!important;
+  }
+  body.alt-cards-v2 #tab-alternates .alt-count{
+    text-align:center;
+  }
+  .alt-modal-grid{
+    grid-template-columns:1fr;
+  }
+}
+/* END SAFE ADDON — ALTERNATE CARDS V2 */
