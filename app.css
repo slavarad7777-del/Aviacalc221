@@ -5728,3 +5728,21 @@ body.hub-v2 #tab-all-tabs-hub .alltabs-section-title{
 }
 
 /* END SAFE ADDON — ALL TABS HUB V2 */
+
+/* SAFE ADDON — ALTERNATES AND BALASHOV MAP */
+.alt-app,.bmap-app{display:grid;gap:12px}
+.alt-hero{border:1px solid rgba(88,216,255,.22);border-radius:12px;padding:13px;background:radial-gradient(circle at 82% 18%,rgba(88,216,255,.12),transparent 34%),linear-gradient(180deg,rgba(13,24,31,.94),rgba(6,10,14,.98));box-shadow:0 10px 26px rgba(0,0,0,.24),inset 0 0 22px rgba(88,216,255,.04)}
+.alt-kicker{color:var(--mu,#76929b);font-size:8px;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:7px}
+.alt-title{color:var(--ac,#58d8ff);font-size:23px;line-height:1;letter-spacing:2.2px;text-transform:uppercase;text-shadow:0 0 14px rgba(88,216,255,.34)}
+.alt-sub{color:var(--tx,#d8f7ff);opacity:.82;font-size:10px;line-height:1.45;margin-top:8px}
+.alt-toolbar{display:grid;grid-template-columns:1fr auto;gap:8px}.alt-search{border:1px solid rgba(88,216,255,.18);background:#050a0e;color:var(--tx,#d8f7ff);border-radius:9px;padding:9px 10px;font-family:var(--mono,monospace);font-size:11px;outline:none}
+.alt-btn{border:1px solid rgba(88,216,255,.22);background:linear-gradient(180deg,#122029,#081016);color:var(--tx,#d8f7ff);border-radius:9px;padding:9px 10px;font-family:var(--mono,monospace);text-transform:uppercase;letter-spacing:.8px;font-size:9px;cursor:pointer}
+.alt-btn.primary{border-color:rgba(120,255,160,.34);background:linear-gradient(180deg,#12301f,#08160d);color:#9dffb0}
+.alt-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.alt-card{border:1px solid rgba(88,216,255,.18);background:linear-gradient(180deg,rgba(12,20,26,.94),rgba(6,10,14,.98));border-radius:11px;padding:10px;box-shadow:0 8px 22px rgba(0,0,0,.20),inset 0 0 16px rgba(88,216,255,.03);display:grid;gap:8px}
+.alt-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.alt-card h3{margin:0;color:#b8f4ff;font-size:13px;letter-spacing:1px;text-transform:uppercase}.alt-card .callsign{color:#9dffb0;font-size:10px;margin-top:3px}.alt-badge{border:1px solid rgba(120,255,160,.24);background:rgba(8,22,12,.72);color:#9dffb0;border-radius:8px;padding:5px 7px;font-size:10px;white-space:nowrap}
+.alt-kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.alt-kv div,.alt-rto{border:1px solid rgba(88,216,255,.12);background:#050a0e;border-radius:8px;padding:7px}.alt-kv span{display:block;color:var(--mu,#76929b);font-size:7px;letter-spacing:.8px;text-transform:uppercase}.alt-kv b{display:block;color:var(--tx,#d8f7ff);font-size:11px;margin-top:4px;line-height:1.25}.alt-rto{color:var(--tx,#d8f7ff);font-size:10px;line-height:1.35}
+.alt-note{border:1px solid rgba(255,209,102,.22);background:rgba(45,38,7,.22);color:#ffd166;border-radius:9px;padding:9px;font-size:10px;line-height:1.45}
+.bmap-viewer{border:1px solid rgba(88,216,255,.22);border-radius:12px;background:#03070a;overflow:auto;height:calc(100vh - 160px);min-height:520px;box-shadow:0 8px 26px rgba(0,0,0,.28),inset 0 0 18px rgba(88,216,255,.035);-webkit-overflow-scrolling:touch}.bmap-inner{transform-origin:top left;transition:transform .12s ease}.bmap-img{display:block;width:100%;max-width:none;user-select:none}
+.bmap-toolbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.bmap-meta{border:1px solid rgba(88,216,255,.16);background:rgba(5,10,14,.92);border-radius:9px;padding:9px;color:var(--mu,#76929b);font-size:10px;line-height:1.45}.bmap-meta b{color:#b8f4ff}
+@media(max-width:760px){.alt-grid{grid-template-columns:1fr}.bmap-toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.bmap-viewer{height:calc(100vh - 190px);min-height:430px}}
+/* END SAFE ADDON — ALTERNATES AND BALASHOV MAP */
