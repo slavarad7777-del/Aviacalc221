@@ -7073,10 +7073,10 @@ function zonesViewZoom(val) {
 })();
 // END SAFE ADDON — ONLINE MAP MODE
 
-// SAFE ADDON — ALL TABS HUB SAFE RESTORE
+// SAFE ADDON — FORCE ALL TABS HUB
 (function(){
-  function el(id){return document.getElementById(id)}
-  function safeJson(k,f){try{var r=localStorage.getItem(k);return r?JSON.parse(r):f}catch(e){return f}}
+  function el(id){ return document.getElementById(id); }
+  function safeJson(k,f){ try{ var r=localStorage.getItem(k); return r?JSON.parse(r):f; }catch(e){ return f; } }
 
   var groups = [
     {title:"Полёт", note:"основное", items:[
@@ -7098,80 +7098,157 @@ function zonesViewZoom(val) {
     ]}
   ];
 
+  function getRoot(){
+    return document.querySelector(".scroll") ||
+           document.querySelector("main") ||
+           document.querySelector("#app") ||
+           document.querySelector(".app") ||
+           document.body;
+  }
+
   function status(){
     var route=safeJson("aviscalc_imported_route_json",[]);
     var r=Array.isArray(route)?route.length:0;
     var zones=safeJson("aviscalc_imported_zones_json",[]);
     var z=Array.isArray(zones)?zones.length:0;
     var gps="—";
-    if(window.__aviscalcGpsLastPosition&&window.__aviscalcGpsLastPosition.coords)gps="OK";
-    var nav=(el("nav-status")&&el("nav-status").textContent)||"STBY";
-    var map={"safe-route":r+" WP","safe-zones":z,"safe-gps":gps,"safe-nav":nav};
-    Object.keys(map).forEach(function(k){var x=el(k);if(x)x.textContent=map[k]});
+    if(window.__aviscalcGpsLastPosition && window.__aviscalcGpsLastPosition.coords) gps="OK";
+    var nav=(el("nav-status") && el("nav-status").textContent) || "STBY";
+    var map={"force-route":r+" WP","force-zones":z,"force-gps":gps,"force-nav":nav};
+    Object.keys(map).forEach(function(k){ var x=el(k); if(x)x.textContent=map[k]; });
   }
 
   function tile(m){
-    return '<button class="safe-tile '+(m.primary?'primary':'')+'" data-safe-go="'+m.tab+'"><div><div class="ico">'+m.icon+'</div><b>'+m.title+'</b><small>'+m.desc+'</small></div></button>';
+    return '<button class="force-tile '+(m.primary?'primary':'')+'" data-force-go="'+m.tab+'">'+
+      '<div><div class="ico">'+m.icon+'</div><b>'+m.title+'</b><small>'+m.desc+'</small></div>'+
+    '</button>';
   }
 
   function ensureHub(){
-    if(el("tab-safe-hub"))return;
-    var scroll=document.querySelector(".scroll");
-    if(!scroll)return;
+    if(el("force-all-tabs")) return;
+
     var page=document.createElement("div");
-    page.className="page safe-alltabs";
-    page.id="tab-safe-hub";
+    page.id="force-all-tabs";
+    page.className="page";
     page.innerHTML =
-      '<section class="safe-hero"><div class="safe-kicker">AVISCALC · CONTROL CENTER</div><div class="safe-title">Все вкладки</div><div class="safe-sub">Безопасно восстановленный главный экран. Нижнее меню скрыто.</div></section>'+
-      '<section class="safe-version"><span><b>AvisCalc Emergency Stable</b></span><span>Hub Restore v1</span></section>'+
-      '<section class="safe-status"><div class="safe-chip"><span>Маршрут</span><b id="safe-route">0 WP</b></div><div class="safe-chip"><span>Зоны</span><b id="safe-zones">0</b></div><div class="safe-chip"><span>GPS</span><b id="safe-gps">—</b></div><div class="safe-chip"><span>NAV</span><b id="safe-nav">STBY</b></div></section>'+
-      groups.map(function(g){return '<section class="safe-group"><div class="safe-group-head"><span>'+g.title+'</span><small>'+g.note+'</small></div><div class="safe-grid">'+g.items.map(tile).join("")+'</div></section>'}).join("");
-    scroll.appendChild(page);
-    page.querySelectorAll("[data-safe-go]").forEach(function(b){
-      b.addEventListener("click",function(){go(b.getAttribute("data-safe-go"))});
+      '<section class="force-hero">'+
+        '<div class="force-kicker">AVISCALC · CONTROL CENTER</div>'+
+        '<div class="force-title">Все вкладки</div>'+
+        '<div class="force-sub">Главный экран управления. Нижнее меню скрыто.</div>'+
+      '</section>'+
+      '<section class="force-version"><span><b>AvisCalc Emergency Stable</b></span><span>Force Hub v1</span></section>'+
+      '<section class="force-status">'+
+        '<div class="force-chip"><span>Маршрут</span><b id="force-route">0 WP</b></div>'+
+        '<div class="force-chip"><span>Зоны</span><b id="force-zones">0</b></div>'+
+        '<div class="force-chip"><span>GPS</span><b id="force-gps">—</b></div>'+
+        '<div class="force-chip"><span>NAV</span><b id="force-nav">STBY</b></div>'+
+      '</section>'+
+      groups.map(function(g){
+        return '<section class="force-group">'+
+          '<div class="force-group-head"><span>'+g.title+'</span><small>'+g.note+'</small></div>'+
+          '<div class="force-grid">'+g.items.map(tile).join("")+'</div>'+
+        '</section>';
+      }).join("");
+
+    getRoot().appendChild(page);
+
+    page.querySelectorAll("[data-force-go]").forEach(function(b){
+      b.addEventListener("click",function(){
+        go(b.getAttribute("data-force-go"));
+      });
     });
+
     status();
   }
 
-  function showHub(){
-    ensureHub();
-    document.body.classList.add("safe-hub-active");
-    document.querySelectorAll(".page").forEach(function(p){p.classList.toggle("active",p.id==="tab-safe-hub")});
-    var sc=document.querySelector(".scroll");if(sc)sc.scrollTop=0;
-    status();
-  }
-
-  function go(tab){
-    document.body.classList.remove("safe-hub-active");
-    if(typeof window.showTab==="function"){
-      try{window.showTab(tab);return}catch(e){}
-    }
-    document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active")});
-    var page=el("tab-"+tab)||el(tab);
-    if(page)page.classList.add("active");
-  }
-
-  function homeButton(){
-    if(el("safe-hub-btn"))return;
+  function ensureHomeButton(){
+    if(el("force-hub-home")) return;
     var b=document.createElement("button");
-    b.id="safe-hub-btn";
-    b.className="safe-hub-btn";
+    b.id="force-hub-home";
+    b.className="force-hub-home";
     b.textContent="Все";
     b.addEventListener("click",showHub);
     document.body.appendChild(b);
   }
 
+  function hideBottomNav(){
+    var selectors=[
+      ".retro-nav",".bottom-nav",".tabbar",".tabs","nav.fixed-bottom","nav.bottom",
+      '[class*="bottom"][class*="nav"]','[class*="tab-bar"]','[class*="tabbar"]'
+    ];
+    selectors.forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(n){
+        n.style.display="none";
+        n.style.visibility="hidden";
+        n.style.pointerEvents="none";
+      });
+    });
+  }
+
+  function showHub(){
+    ensureHub();
+    document.body.classList.add("force-hub","force-hub-active");
+    hideBottomNav();
+
+    document.querySelectorAll(".page").forEach(function(p){
+      p.classList.toggle("active",p.id==="force-all-tabs");
+      if(p.id!=="force-all-tabs") p.style.display="none";
+    });
+
+    var hub=el("force-all-tabs");
+    if(hub){
+      hub.style.display="grid";
+      hub.classList.add("active");
+    }
+
+    var root=getRoot();
+    if(root && root.scrollTop !== undefined) root.scrollTop=0;
+    status();
+  }
+
+  function leaveHub(){
+    document.body.classList.remove("force-hub-active");
+    var hub=el("force-all-tabs");
+    if(hub){
+      hub.classList.remove("active");
+      hub.style.display="none";
+    }
+    document.querySelectorAll(".page").forEach(function(p){
+      if(p.id!=="force-all-tabs") p.style.display="";
+    });
+    hideBottomNav();
+  }
+
+  function go(tab){
+    leaveHub();
+    if(typeof window.showTab==="function"){
+      try{ window.showTab(tab); hideBottomNav(); return; }catch(e){}
+    }
+
+    document.querySelectorAll(".page").forEach(function(p){
+      p.classList.remove("active");
+      p.style.display="";
+    });
+    var page=el("tab-"+tab)||el(tab);
+    if(page){
+      page.classList.add("active");
+    }
+    hideBottomNav();
+  }
+
   function patchShowTab(){
-    if(window.__safeHubPatched)return;
-    window.__safeHubPatched=true;
+    if(window.__forceHubPatched) return;
+    window.__forceHubPatched=true;
+
     if(typeof window.showTab==="function"){
       var old=window.showTab;
       window.showTab=function(t){
-        if(t==="safe-hub"||t==="all-tabs-hub"||t==="home"){
-          showHub();return;
+        if(t==="force-hub" || t==="all-tabs-hub" || t==="home"){
+          showHub(); return;
         }
-        document.body.classList.remove("safe-hub-active");
+        leaveHub();
         var res=old.apply(this,arguments);
+        setTimeout(hideBottomNav,50);
         setTimeout(status,80);
         return res;
       };
@@ -7179,15 +7256,25 @@ function zonesViewZoom(val) {
   }
 
   function init(){
-    document.body.classList.add("safe-hub");
+    document.body.classList.add("force-hub");
     ensureHub();
-    homeButton();
+    ensureHomeButton();
     patchShowTab();
-    setTimeout(showHub,900);
-    setInterval(status,12000);
+    hideBottomNav();
+
+    setTimeout(showHub,1200);
+    setTimeout(function(){ ensureHub(); hideBottomNav(); },2500);
+
+    var obs=new MutationObserver(function(){
+      ensureHub();
+      hideBottomNav();
+    });
+    obs.observe(document.body,{childList:true,subtree:true});
+
+    setInterval(function(){ hideBottomNav(); status(); },1500);
   }
 
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init);
   else init();
 })();
-// END SAFE ADDON — ALL TABS HUB SAFE RESTORE
+// END SAFE ADDON — FORCE ALL TABS HUB

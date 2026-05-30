@@ -5308,75 +5308,123 @@ body.retro-true #tab-navigator-lite .ph{display:none!important}
 }
 /* END SAFE ADDON — ONLINE MAP MODE */
 
-/* SAFE ADDON — ALL TABS HUB SAFE RESTORE */
-body.safe-hub .retro-nav{
+/* SAFE ADDON — FORCE ALL TABS HUB */
+
+/* Жёстко скрываем все известные варианты нижнего меню */
+body.force-hub .retro-nav,
+body.force-hub .bottom-nav,
+body.force-hub .tabbar,
+body.force-hub .tabs,
+body.force-hub nav.fixed-bottom,
+body.force-hub nav.bottom,
+body.force-hub [class*="bottom"][class*="nav"],
+body.force-hub [class*="tab-bar"],
+body.force-hub [class*="tabbar"],
+body.force-hub [data-role="bottom-nav"]{
   display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
 }
-body.safe-hub .scroll,
-body.safe-hub main{
+
+/* Если нижнее меню было fixed и оставляло место — убираем лишний отступ */
+body.force-hub main,
+body.force-hub .scroll,
+body.force-hub .app,
+body.force-hub .shell,
+body.force-hub #app{
   padding-bottom:12px!important;
 }
-.safe-hub-btn{
+
+/* Верхняя кнопка возврата */
+.force-hub-home{
   position:fixed;
   right:10px;
   top:calc(env(safe-area-inset-top,0px) + 10px);
-  z-index:100002;
-  border:1px solid rgba(88,216,255,.28);
-  background:rgba(5,10,14,.94);
+  z-index:2147483000;
+  border:1px solid rgba(88,216,255,.32);
+  background:rgba(5,10,14,.96);
   color:#b8f4ff;
   border-radius:10px;
   padding:8px 10px;
-  font-family:var(--mono,monospace);
+  font-family:monospace;
   text-transform:uppercase;
   letter-spacing:.9px;
   font-size:10px;
   box-shadow:0 0 18px rgba(0,0,0,.35), inset 0 0 14px rgba(88,216,255,.04);
   cursor:pointer;
 }
-body.safe-hub.safe-hub-active .safe-hub-btn{
+
+body.force-hub.force-hub-active .force-hub-home{
   display:none!important;
 }
-.safe-alltabs{
-  display:grid;
-  gap:11px;
-  padding:10px!important;
+
+/* Экран Все вкладки */
+#force-all-tabs{
+  display:none;
+  min-height:100vh;
+  box-sizing:border-box;
+  padding:12px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(88,216,255,.08), transparent 34%),
+    linear-gradient(180deg,#070b10,#030507);
+  color:#d8f7ff;
+  font-family:monospace;
 }
-.safe-hero{
+
+body.force-hub.force-hub-active #force-all-tabs{
+  display:grid!important;
+  gap:11px;
+}
+
+/* Когда открыт хаб — прячем остальные экраны/страницы */
+body.force-hub.force-hub-active .page:not(#force-all-tabs),
+body.force-hub.force-hub-active section.page:not(#force-all-tabs),
+body.force-hub.force-hub-active .screen:not(#force-all-tabs),
+body.force-hub.force-hub-active main > div:not(#force-all-tabs):not(.force-hub-home){
+  display:none!important;
+}
+
+.force-hero{
   border:1px solid rgba(88,216,255,.22);
   border-radius:12px;
   padding:13px;
-  background:radial-gradient(circle at 82% 18%,rgba(88,216,255,.12),transparent 34%),linear-gradient(180deg,rgba(13,24,31,.94),rgba(6,10,14,.98));
+  background:
+    radial-gradient(circle at 82% 18%,rgba(88,216,255,.12),transparent 34%),
+    linear-gradient(180deg,rgba(13,24,31,.94),rgba(6,10,14,.98));
   box-shadow:0 10px 26px rgba(0,0,0,.24), inset 0 0 22px rgba(88,216,255,.04);
 }
-.safe-kicker{
-  color:var(--mu,#76929b);
+
+.force-kicker{
+  color:#76929b;
   font-size:8px;
   letter-spacing:1.8px;
   text-transform:uppercase;
   margin-bottom:7px;
 }
-.safe-title{
-  color:var(--ac,#58d8ff);
-  font-size:23px;
+
+.force-title{
+  color:#58d8ff;
+  font-size:24px;
   line-height:1;
   letter-spacing:2.2px;
   text-transform:uppercase;
   text-shadow:0 0 14px rgba(88,216,255,.34);
 }
-.safe-sub{
-  color:var(--tx,#d8f7ff);
+
+.force-sub{
+  color:#d8f7ff;
   opacity:.82;
   font-size:10px;
   line-height:1.45;
   margin-top:8px;
 }
-.safe-version{
+
+.force-version{
   border:1px solid rgba(88,216,255,.14);
   background:rgba(5,10,14,.82);
-  color:var(--mu,#76929b);
+  color:#76929b;
   border-radius:9px;
   padding:8px 9px;
-  font-family:var(--mono,monospace);
   font-size:9px;
   line-height:1.35;
   display:flex;
@@ -5384,33 +5432,36 @@ body.safe-hub.safe-hub-active .safe-hub-btn{
   gap:8px;
   flex-wrap:wrap;
 }
-.safe-version b{color:#b8f4ff}
-.safe-version span:last-child{color:#9dffb0}
-.safe-status{
+.force-version b{color:#b8f4ff}
+.force-version span:last-child{color:#9dffb0}
+
+.force-status{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:7px;
 }
-.safe-chip{
+
+.force-chip{
   border:1px solid rgba(88,216,255,.16);
   background:rgba(5,10,14,.92);
   border-radius:9px;
   padding:8px;
 }
-.safe-chip span{
+.force-chip span{
   display:block;
-  color:var(--mu,#76929b);
+  color:#76929b;
   font-size:7px;
   letter-spacing:.9px;
   text-transform:uppercase;
 }
-.safe-chip b{
+.force-chip b{
   display:block;
   color:#b8f4ff;
   font-size:14px;
   margin-top:4px;
 }
-.safe-group{
+
+.force-group{
   border:1px solid rgba(88,216,255,.14);
   background:linear-gradient(180deg,rgba(8,15,20,.72),rgba(4,8,12,.86));
   border-radius:12px;
@@ -5418,77 +5469,64 @@ body.safe-hub.safe-hub-active .safe-hub-btn{
   display:grid;
   gap:8px;
 }
-.safe-group-head{
+
+.force-group-head{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:8px;
-  padding:0 2px;
   color:#58d8ff;
-  font-family:var(--mono,monospace);
   font-size:9px;
   letter-spacing:1.8px;
   text-transform:uppercase;
 }
-.safe-group-head small{
-  color:var(--mu,#76929b);
-  font-size:8px;
-}
-.safe-grid{
+.force-group-head small{color:#76929b;font-size:8px}
+
+.force-grid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
   gap:8px;
 }
-.safe-tile{
+
+.force-tile{
   border:1px solid rgba(88,216,255,.18);
-  background:radial-gradient(circle at 82% 20%,rgba(88,216,255,.08),transparent 34%),linear-gradient(180deg,rgba(12,20,26,.94),rgba(6,10,14,.98));
-  color:var(--tx,#d8f7ff);
+  background:
+    radial-gradient(circle at 82% 20%,rgba(88,216,255,.08),transparent 34%),
+    linear-gradient(180deg,rgba(12,20,26,.94),rgba(6,10,14,.98));
+  color:#d8f7ff;
   border-radius:11px;
   padding:10px;
   min-height:78px;
   cursor:pointer;
-  font-family:var(--mono,monospace);
+  font-family:monospace;
   text-align:left;
   display:grid;
   align-content:space-between;
-  box-shadow:0 8px 22px rgba(0,0,0,.20), inset 0 0 16px rgba(88,216,255,.03);
 }
-.safe-tile.primary{
+.force-tile.primary{
   border-color:rgba(120,255,160,.32);
-  background:radial-gradient(circle at 82% 20%,rgba(120,255,160,.10),transparent 34%),linear-gradient(180deg,rgba(12,28,18,.94),rgba(6,10,14,.98));
+  background:
+    radial-gradient(circle at 82% 20%,rgba(120,255,160,.10),transparent 34%),
+    linear-gradient(180deg,rgba(12,28,18,.94),rgba(6,10,14,.98));
 }
-.safe-tile .ico{
-  color:#58d8ff;
-  font-size:20px;
-  line-height:1;
-}
-.safe-tile.primary .ico{color:#9dffb0}
-.safe-tile b{
+.force-tile .ico{color:#58d8ff;font-size:20px}
+.force-tile.primary .ico{color:#9dffb0}
+.force-tile b{
   display:block;
-  color:var(--tx,#d8f7ff);
   font-size:10px;
   letter-spacing:1px;
   text-transform:uppercase;
   margin-top:7px;
 }
-.safe-tile small{
+.force-tile small{
   display:block;
-  color:var(--mu,#76929b);
+  color:#76929b;
   font-size:8px;
   line-height:1.25;
   margin-top:4px;
 }
-body.safe-hub:not(.safe-hub-active) .page.active{
-  padding-top:42px!important;
-}
-body.safe-hub.safe-hub-active #tab-safe-hub{
-  display:grid!important;
-}
-body.safe-hub:not(.safe-hub-active) #tab-safe-hub{
-  display:none!important;
-}
+
 @media(max-width:430px){
-  .safe-status{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .safe-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .force-status{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .force-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-/* END SAFE ADDON — ALL TABS HUB SAFE RESTORE */
+/* END SAFE ADDON — FORCE ALL TABS HUB */
